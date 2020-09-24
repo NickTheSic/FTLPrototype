@@ -9,7 +9,7 @@
 
 
 #undef print
-#define print(msg) GEngine->AddOnScreenDebugMessage(0, 3, FColor::Red, msg);
+#define print(msg) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, msg);
 
 // Sets default values
 ABasePlayer::ABasePlayer()
@@ -207,15 +207,24 @@ void ABasePlayer::AddPlayerTags()
 		break;
 
 	case PlayerClass::Engineer :
-		this->Tags.Add("Engineer");
+		if (!ActorHasTag("Engineer"))
+		{
+			this->Tags.Add("Engineer");
+		}
 		break;
 
 	case PlayerClass::Medic :
-		this->Tags.Add("Medic");
+		if (!ActorHasTag("Medic"))
+		{
+			this->Tags.Add("Medic");
+		}
 		break;
 
 	case PlayerClass::Gunner :
-		this->Tags.Add("Gunner");
+		if (!ActorHasTag("Gunner"))
+		{
+			this->Tags.Add("Gunner");
+		}
 		break;
 
 	default :

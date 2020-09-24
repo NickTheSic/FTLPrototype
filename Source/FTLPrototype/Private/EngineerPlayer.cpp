@@ -5,7 +5,7 @@
 
 AEngineerPlayer::AEngineerPlayer()
 {
-	//this->Tags.Add("Engineer");
+	this->Tags.Add("Engineer");
 	classInformation.playerClass = PlayerClass::Engineer;
 }
 

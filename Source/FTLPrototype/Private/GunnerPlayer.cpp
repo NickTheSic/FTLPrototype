@@ -5,7 +5,7 @@
 
 AGunnerPlayer::AGunnerPlayer()
 {
-	//this->Tags.Add("Gunner");
+	this->Tags.Add("Gunner");
 	classInformation.playerClass = PlayerClass::Gunner;
 }
 
