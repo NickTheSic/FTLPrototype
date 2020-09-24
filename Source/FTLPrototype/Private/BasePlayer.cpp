@@ -36,9 +36,37 @@ ABasePlayer::ABasePlayer()
 
 void ABasePlayer::UseWeapon()
 {
-	if (pActiveItem != nullptr)
+	if (pActiveWeapon != nullptr)
 	{
 		//Use the weapon
+	}
+}
+
+#define InventoryGetItem(item) nullptr;
+
+void ABasePlayer::SwitchToInventorySlot(int item)
+{
+	switch (item)
+	{
+	case 1:
+		//Select the Gun
+		pActiveWeapon = InventoryGetItem(gun);
+		break;
+	case 2:
+		//Select melee
+		pActiveWeapon = InventoryGetItem(melee);
+		break;
+	case 3:
+		//Select class item
+		pActiveWeapon = InventoryGetItem(classItem);
+		break;
+	case 4:
+		//Select Grenade
+		pActiveWeapon = InventoryGetItem(grenade);
+		break;
+	default:
+		print("Whoops we didn't switch to a valid item");
+		break;
 	}
 }
 

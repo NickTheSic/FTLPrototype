@@ -30,9 +30,13 @@ public:
 		class UHealthComponent* pHealthComponent = nullptr;
 
 	UPROPERTY()
-		class AWeapon* pActiveItem = nullptr;
+		class AWeapon* pActiveWeapon = nullptr;
 
-	void UseWeapon();
+	UFUNCTION()
+		void UseWeapon(); //A Function to use our pActiveItem
+
+	UFUNCTION()
+		void SwitchToInventorySlot(int item); //A Function to switch our pActiveItem when a number key is pressed
 
 protected:
 	// Called when the game starts or when spawned
