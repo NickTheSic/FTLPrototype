@@ -13,5 +13,12 @@ UCLASS()
 class FTLPROTOTYPE_API AGunnerPlayer : public ABasePlayer
 {
 	GENERATED_BODY()
+
+public:
+	AGunnerPlayer();
+
+protected:
+
+	virtual void BeginPlay() override;
 	
 };
