@@ -22,6 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Class Information")
 		FClassInformation classInformation; //A Struct to hold all the class information
 
+
 	UPROPERTY()
 		class UUInventory* pInventoryComponent = nullptr;
 
@@ -30,6 +31,8 @@ public:
 
 	UPROPERTY()
 		class AWeapon* pActiveItem = nullptr;
+
+	void UseWeapon();
 
 protected:
 	// Called when the game starts or when spawned

@@ -9,7 +9,7 @@
 
 
 #undef print
-#define print(msg) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, msg);
+#define print(msg) GEngine->AddOnScreenDebugMessage(0, 3, FColor::Red, msg);
 
 // Sets default values
 ABasePlayer::ABasePlayer()
@@ -32,6 +32,14 @@ ABasePlayer::ABasePlayer()
 	pInventoryComponent = CreateDefaultSubobject<UUInventory>("Inventory Component");
 
 
+}
+
+void ABasePlayer::UseWeapon()
+{
+	if (pActiveItem != nullptr)
+	{
+		//Use the weapon
+	}
 }
 
 // Called when the game starts or when spawned
