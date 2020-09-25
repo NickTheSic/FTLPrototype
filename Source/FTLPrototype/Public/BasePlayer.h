@@ -38,6 +38,12 @@ public:
 	UFUNCTION()
 		void SwitchToInventorySlot(int item); //A Function to switch our pActiveItem when a number key is pressed
 
+	UFUNCTION()
+		void SwitchInventoryWithMouseWheel(int val); //Switch up or down based on the value I guess
+
+	void SwitchInventoryMouseWheelUp();
+	void SwitchInventoryMouseWheelDown();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -58,6 +64,15 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	//Probably won't be needed
+	UFUNCTION()
+		void MoveRight(int val);
+	UFUNCTION()
+		void MoveForward(int val);
+	UFUNCTION()
+		void Jump();
 
 private:
 

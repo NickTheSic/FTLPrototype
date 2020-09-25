@@ -75,6 +75,25 @@ void ABasePlayer::SwitchToInventorySlot(int item)
 	}
 }
 
+void ABasePlayer::SwitchInventoryWithMouseWheel(int val)
+{
+	if (val == 0) return;
+
+	if (val < 0) SwitchInventoryMouseWheelDown();
+	else		 SwitchInventoryMouseWheelUp();
+
+}
+
+void ABasePlayer::SwitchInventoryMouseWheelUp()
+{
+
+}
+
+void ABasePlayer::SwitchInventoryMouseWheelDown()
+{
+
+}
+
 // Called when the game starts or when spawned
 void ABasePlayer::BeginPlay()
 {
@@ -151,6 +170,28 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+
+//PROBABLY WON'T BE NEEDED
+void ABasePlayer::MoveRight(int val)
+{
+	if (val != 0)
+	{
+
+	}
+}
+void ABasePlayer::MoveForward(int val)
+{
+	if (val != 0)
+	{
+
+	}
+}
+void ABasePlayer::Jump()
+{
+
+}
+
 
 //I am not sure how the inventory is going to work
 //Putting this here to quickly and easily change it all at once
