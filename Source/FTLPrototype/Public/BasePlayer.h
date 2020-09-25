@@ -82,7 +82,6 @@ public:
 	UFUNCTION()
 		void MoveForward(float val);
 
-
 private:
 
 	bool bHasPopulatedInventory = false; //We only want to populate the inventory once

@@ -45,6 +45,8 @@ class AFTLPrototypeCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
 
+		class URaycastComponent* pRaycastComponent;
+
 public:
 	AFTLPrototypeCharacter();
 
@@ -93,6 +95,8 @@ protected:
 
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
+
+	void OnInteract();
 
 	/**
 	 * Called via input to turn at a given rate.
