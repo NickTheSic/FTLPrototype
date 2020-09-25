@@ -11,6 +11,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include "DrawDebugHelpers.h"
+
+
+#include "RaycastComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -80,6 +84,8 @@ AFTLPrototypeCharacter::AFTLPrototypeCharacter()
 	VR_MuzzleLocation->SetRelativeLocation(FVector(0.000004, 53.999992, 10.000000));
 	VR_MuzzleLocation->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));		// Counteract the rotation of the VR gun model.
 
+	pRaycastComponent = CreateDefaultSubobject<URaycastComponent>(TEXT("RaycastComponent"));
+
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
 }
@@ -105,6 +111,23 @@ void AFTLPrototypeCharacter::BeginPlay()
 	}
 }
 
+void AFTLPrototypeCharacter::OnInteract()
+{
+	TArray<FHitResult> rays;
+	if (pRaycastComponent->RaycastMultiFromPlayer(rays, 2000.f))
+	{
+		for (auto& ray : rays)
+		{
+			if (ray.GetActor()->Tags.Contains("White"))
+				ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 150.0f);
+		}
+		//if (ray.GetActor()->Tags.Contains("White"))
+		//	ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 20);
+		//else if (ray.GetActor()->Tags.Contains("Gold"))
+		//	ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 75);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -116,6 +139,7 @@ void AFTLPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	// Bind jump events
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AFTLPrototypeCharacter::OnInteract);
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFTLPrototypeCharacter::OnFire);
