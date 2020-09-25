@@ -4,20 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "BasePlayer.h"
-#include "GunnerPlayer.generated.h"
+#include "MedicPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FTLPROTOTYPE_API AGunnerPlayer : public ABasePlayer
+class FTLPROTOTYPE_API AMedicPlayer : public ABasePlayer
 {
 	GENERATED_BODY()
-
 public:
-	AGunnerPlayer();
+	AMedicPlayer();
 
 protected:
 	virtual void BeginPlay() override;
-	
+
 };
