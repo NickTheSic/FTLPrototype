@@ -50,12 +50,17 @@ void ABasePlayer::UseWeapon()
 	}
 }
 
-#define InventoryGetItem(item) nullptr;
+#define InventoryGetItem(item) nullptr; print( "item selected");
 
 //Switches to the specific slot in the inventory that was pressed
-void ABasePlayer::SwitchToInventorySlot(int item)
+void ABasePlayer::SwitchToInventorySlot(float item)
 {
-	switch (item)
+	if (item == 0.0f) return;
+
+	//Cast the item number to an int for the switch statement
+	int val = static_cast<int>(item);
+
+	switch (val)
 	{
 	case 1:
 		//Select the Gun
@@ -185,6 +190,10 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
+
+	//Required - Add the axis or whatever for this
+	PlayerInputComponent->BindAxis("WeaponSelect", this, &ABasePlayer::SwitchToInventorySlot);
+
 }
 
 
@@ -192,14 +201,14 @@ void ABasePlayer::MoveRight(float val)
 {
 	if (val != 0.0f)
 	{
-		AddMovementInput(GetActorForwardVector(), val);
+		AddMovementInput(GetActorRightVector(), val);
 	}
 }
 void ABasePlayer::MoveForward(float val)
 {
 	if (val != 0.0f)
 	{
-		AddMovementInput(GetActorRightVector(), val);
+		AddMovementInput(GetActorForwardVector(), val);
 	}
 }
 

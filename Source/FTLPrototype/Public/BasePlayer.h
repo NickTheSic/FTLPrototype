@@ -45,7 +45,7 @@ public:
 
 
 	UFUNCTION()
-		void SwitchToInventorySlot(int item); //A Function to switch our pActiveItem when a number key is pressed
+		void SwitchToInventorySlot(float item); //A Function to switch our pActiveItem when a number key is pressed
 
 
 	UFUNCTION()
@@ -81,6 +81,7 @@ public:
 		void MoveRight(float val);
 	UFUNCTION()
 		void MoveForward(float val);
+
 
 private:
 
