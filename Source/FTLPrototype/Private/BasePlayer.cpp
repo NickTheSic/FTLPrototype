@@ -2,6 +2,8 @@
 
 
 #include "BasePlayer.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "HealthComponent.h"
 #include "UInventory.h"
@@ -17,11 +19,13 @@ ABasePlayer::ABasePlayer()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Setup Collider
+	SetRootComponent(GetCapsuleComponent());
+
+	//Setup Camera
+
 
 	//Setup Mesh
-
-
-	//Setup Collider
 
 
 	//Setup the Health Component
