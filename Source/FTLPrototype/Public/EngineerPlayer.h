@@ -14,4 +14,11 @@ class FTLPROTOTYPE_API AEngineerPlayer : public ABasePlayer
 {
 	GENERATED_BODY()
 	
+public:
+	AEngineerPlayer();
+
+protected:
+
+	virtual void BeginPlay() override;
+
 };
