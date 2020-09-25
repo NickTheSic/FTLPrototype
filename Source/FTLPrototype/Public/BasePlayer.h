@@ -22,6 +22,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Class Information")
 		FClassInformation classInformation; //A Struct to hold all the class specific information
 
+	/** First person camera */ //Copied from Prototype Character
+	UPROPERTY(EditAnywhere, Category = "Camera")
+		class UCameraComponent* pCameraComponent;
+
 
 	UPROPERTY()
 		class UUInventory* pInventoryComponent = nullptr; //A nullptr to the Inventory, created later
@@ -29,14 +33,20 @@ public:
 	UPROPERTY()
 		class UHealthComponent* pHealthComponent = nullptr; //A ptr to the Health set to null for now
 
+
+
 	UPROPERTY()
 		class AWeapon* pActiveWeapon = nullptr; //A pointer to the active weapon
+
 
 	UFUNCTION()
 		void UseWeapon(); //A Function to use our pActiveItem
 
+
+
 	UFUNCTION()
 		void SwitchToInventorySlot(int item); //A Function to switch our pActiveItem when a number key is pressed
+
 
 	UFUNCTION()
 		void SwitchInventoryWithMouseWheel(int val); //Switch up or down based on the value I guess
@@ -68,11 +78,9 @@ public:
 
 	//Probably won't be needed
 	UFUNCTION()
-		void MoveRight(int val);
+		void MoveRight(float val);
 	UFUNCTION()
-		void MoveForward(int val);
-	UFUNCTION()
-		void Jump();
+		void MoveForward(float val);
 
 private:
 

@@ -2,6 +2,7 @@
 
 
 #include "BasePlayer.h"
+#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
@@ -20,10 +21,13 @@ ABasePlayer::ABasePlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Setup Collider
-	SetRootComponent(GetCapsuleComponent());
+	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
 	//Setup Camera
-
+	pCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	pCameraComponent->SetupAttachment(GetCapsuleComponent());
+	pCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
+	pCameraComponent->bUsePawnControlRotation = true;
 
 	//Setup Mesh
 
@@ -169,27 +173,34 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// Bind jump events
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	//Movement
+	PlayerInputComponent->BindAxis("MoveForward", this, &ABasePlayer::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ABasePlayer::MoveRight);
+
+	//Turning
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
 }
 
 
-//PROBABLY WON'T BE NEEDED
-void ABasePlayer::MoveRight(int val)
+void ABasePlayer::MoveRight(float val)
 {
-	if (val != 0)
+	if (val != 0.0f)
 	{
-
+		AddMovementInput(GetActorForwardVector(), val);
 	}
 }
-void ABasePlayer::MoveForward(int val)
+void ABasePlayer::MoveForward(float val)
 {
-	if (val != 0)
+	if (val != 0.0f)
 	{
-
+		AddMovementInput(GetActorRightVector(), val);
 	}
-}
-void ABasePlayer::Jump()
-{
-
 }
 
 
