@@ -42,7 +42,8 @@ public:
 	UFUNCTION()
 		void UseWeapon(); //A Function to use our pActiveItem
 
-
+	UFUNCTION()
+		void Interact();
 
 	UFUNCTION()
 		void SwitchToInventorySlot(float item); //A Function to switch our pActiveItem when a number key is pressed

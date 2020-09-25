@@ -103,6 +103,17 @@ void ABasePlayer::SwitchInventoryMouseWheelDown()
 
 }
 
+#define RaycastThingy() false
+void ABasePlayer::Interact()
+{
+	FHitResult ray;
+	if (RaycastThingy())
+	{
+
+	}
+}
+#undef RaycastThingy
+
 // Called when the game starts or when spawned
 void ABasePlayer::BeginPlay()
 {
@@ -182,16 +193,25 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	//Our main action event
+	// Bind fire event
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABasePlayer::UseWeapon);
+
+	//Interaction
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABasePlayer::Interact);
+
+
 	//Movement
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABasePlayer::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ABasePlayer::MoveRight);
+
 
 	//Turning
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 
-	//Required - Add the axis or whatever for this
+	//Switching weapon functions
 	PlayerInputComponent->BindAxis("WeaponSelect", this, &ABasePlayer::SwitchToInventorySlot);
 
 }
