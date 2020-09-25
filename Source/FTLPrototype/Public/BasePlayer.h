@@ -71,8 +71,6 @@ public:
 		void MoveRight(int val);
 	UFUNCTION()
 		void MoveForward(int val);
-	UFUNCTION()
-		void Jump();
 
 private:
 

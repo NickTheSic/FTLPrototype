@@ -113,10 +113,18 @@ void AFTLPrototypeCharacter::BeginPlay()
 
 void AFTLPrototypeCharacter::OnInteract()
 {
-	FHitResult ray;
-	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 150.f))
+	TArray<FHitResult> rays;
+	if (pRaycastComponent->RaycastMultiFromPlayer(rays, 2000.f))
 	{
-		ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 10);
+		for (auto& ray : rays)
+		{
+			if (ray.GetActor()->Tags.Contains("White"))
+				ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 150.0f);
+		}
+		//if (ray.GetActor()->Tags.Contains("White"))
+		//	ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 20);
+		//else if (ray.GetActor()->Tags.Contains("Gold"))
+		//	ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 75);
 	}
 }
 

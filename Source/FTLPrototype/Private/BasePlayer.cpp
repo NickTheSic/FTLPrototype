@@ -187,10 +187,6 @@ void ABasePlayer::MoveForward(int val)
 
 	}
 }
-void ABasePlayer::Jump()
-{
-
-}
 
 
 //I am not sure how the inventory is going to work
