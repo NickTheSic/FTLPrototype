@@ -44,6 +44,7 @@ void ABasePlayer::UseWeapon()
 
 #define InventoryGetItem(item) nullptr;
 
+//Switches to the specific slot in the inventory that was pressed
 void ABasePlayer::SwitchToInventorySlot(int item)
 {
 	switch (item)
@@ -75,7 +76,9 @@ void ABasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//A Function to add the tag automatically in case I forget
 	AddPlayerTags();
+
 
 	//Populate the inventory everytime BeginPlay gets called
 	bHasPopulatedInventory = false;
@@ -83,7 +86,8 @@ void ABasePlayer::BeginPlay()
 	
 }
 
-
+//A DEMO CLASS
+//Just so I have some random code to place
 class RepairableObjectTemplate
 {
 public:
@@ -94,9 +98,7 @@ public:
 void ABasePlayer::Repair()
 {
 	//* GET THE ITEM TO REPAIR SOMEWHERE *//
-
 	print("No way to get the item to repair yet");
-
 	return;
 
 	RepairableObjectTemplate *RepairObject = nullptr; //GetRepiarObject();
@@ -161,8 +163,8 @@ void ABasePlayer::PopulateInventory()
 	}
 
 
-	UWorld* world = GetWorld();
-	FActorSpawnParameters spawnParams;
+	UWorld* world = GetWorld();	//Get the world
+	FActorSpawnParameters spawnParams;	//Just basic spawnParams
 
 
 	if (classInformation.gunItemTemplate != nullptr)
@@ -180,6 +182,7 @@ void ABasePlayer::PopulateInventory()
 		print("No Gun Item");
 	}
 
+
 	if (classInformation.meleeItemTemplate != nullptr)
 	{
 		//Create the Melee item
@@ -194,6 +197,7 @@ void ABasePlayer::PopulateInventory()
 	{
 		print("No Melee Item");
 	}
+
 
 	if (classInformation.classItemTemplate != nullptr)
 	{
@@ -235,6 +239,7 @@ void ABasePlayer::PopulateInventory()
 
 void ABasePlayer::AddPlayerTags()
 {
+	//Add the item tags in case I forgot to add them in code
 	switch (classInformation.playerClass)
 	{
 	case PlayerClass::Unknown : 

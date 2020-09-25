@@ -18,7 +18,6 @@ public:
 	AGunnerPlayer();
 
 protected:
-
 	virtual void BeginPlay() override;
 	
 };

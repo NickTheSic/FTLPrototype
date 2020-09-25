@@ -17,7 +17,6 @@ public:
 	AMedicPlayer();
 
 protected:
-
 	virtual void BeginPlay() override;
 
 };

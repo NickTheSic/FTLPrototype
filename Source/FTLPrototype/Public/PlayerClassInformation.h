@@ -7,11 +7,11 @@
 UENUM()
 enum class PlayerClass
 {
-	Unknown = -1,
-	Base = 0,
-	Gunner = 1,
-	Engineer = 2,
-	Medic = 3
+	Unknown = -1, //I guess I wanted to have an error in case
+	Base = 0,	// Just the basic unset character
+	Gunner = 1,	//Gunner type
+	Engineer = 2,	//Engineer type
+	Medic = 3,	//Medic type
 };
 
 //A Struct to hold all the Class information to keep the player a little more clean
@@ -23,16 +23,16 @@ struct FClassInformation
 public:
 	//Weapon templates setup
 	UPROPERTY(EditAnywhere, Category = "Class Config | Weapon")
-		TSubclassOf<class AWeapon> gunItemTemplate;
+		TSubclassOf<class AWeapon> gunItemTemplate;		//The template for the Main gun
 
 	UPROPERTY(EditAnywhere, Category = "Class Config | Weapon")
-		TSubclassOf<class AWeapon> meleeItemTemplate;
+		TSubclassOf<class AWeapon> meleeItemTemplate;	//The template item for the Melee weapon
 
 	UPROPERTY(EditAnywhere, Category = "Class Config | Weapon")
-		TSubclassOf<class AWeapon> classItemTemplate;
+		TSubclassOf<class AWeapon> classItemTemplate;	//The class specific item template
 
 	UPROPERTY(EditAnywhere, Category = "Class Config | Weapon")
-		TSubclassOf<class AWeapon> grenadeItemTemplate;
+		TSubclassOf<class AWeapon> grenadeItemTemplate;	//The throwable item template
 
 
 	//Repair speed setup
@@ -57,5 +57,5 @@ public:
 		float fHealspeed = 10.0f; //How quickly the player can heal
 
 	UPROPERTY(EditAnywhere, Category = "Class Config | Status")
-		PlayerClass playerClass;
+		PlayerClass playerClass;	//Holds the class type for the player
 };

@@ -20,17 +20,17 @@ public:
 	ABasePlayer();
 
 	UPROPERTY(EditAnywhere, Category = "Class Information")
-		FClassInformation classInformation; //A Struct to hold all the class information
+		FClassInformation classInformation; //A Struct to hold all the class specific information
 
 
 	UPROPERTY()
-		class UUInventory* pInventoryComponent = nullptr;
+		class UUInventory* pInventoryComponent = nullptr; //A nullptr to the Inventory, created later
 
 	UPROPERTY()
-		class UHealthComponent* pHealthComponent = nullptr;
+		class UHealthComponent* pHealthComponent = nullptr; //A ptr to the Health set to null for now
 
 	UPROPERTY()
-		class AWeapon* pActiveWeapon = nullptr;
+		class AWeapon* pActiveWeapon = nullptr; //A pointer to the active weapon
 
 	UFUNCTION()
 		void UseWeapon(); //A Function to use our pActiveItem
