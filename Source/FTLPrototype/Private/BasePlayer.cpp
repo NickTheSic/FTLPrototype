@@ -5,8 +5,10 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "HealthComponent.h"
+#include "RaycastComponent.h"
 #include "UInventory.h"
 #include "Weapon.h"
 
@@ -30,6 +32,20 @@ ABasePlayer::ABasePlayer()
 	pCameraComponent->bUsePawnControlRotation = true;
 
 	//Setup Mesh
+	pMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Player Mesh"));
+	pMeshComponent->SetOnlyOwnerSee(true);
+	pMeshComponent->SetupAttachment(pCameraComponent);
+	pMeshComponent->bCastDynamicShadow = false;
+	pMeshComponent->CastShadow = false;
+	pMeshComponent->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
+	pMeshComponent->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
+
+	// Create a gun mesh component
+	pWeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
+	pWeaponMesh->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	pWeaponMesh->bCastDynamicShadow = false;
+	pWeaponMesh->CastShadow = false;
+	pWeaponMesh->SetupAttachment(RootComponent);
 
 
 	//Setup the Health Component
@@ -40,18 +56,28 @@ ABasePlayer::ABasePlayer()
 	pInventoryComponent = CreateDefaultSubobject<UUInventory>("Inventory Component");
 
 
+	//Setup the Raycast Component
+	pRaycastComponent = CreateDefaultSubobject<URaycastComponent>("Raycast Component");
+
+
 }
 
+#define Use() ;// ->Use;
 void ABasePlayer::UseWeapon()
 {
 	if (pActiveWeapon != nullptr)
 	{
 		//Use the weapon
+		pActiveWeapon Use()
 	}
 }
 
-#define InventoryGetItem(item) nullptr; print( "item selected");
+void ABasePlayer::SetWeaponMesh()
+{
+	//pWeaponMesh = pActiveWeapon->GetMesh();
+}
 
+#define InventoryGetItem(item) nullptr; print( "item selected");
 //Switches to the specific slot in the inventory that was pressed
 void ABasePlayer::SwitchToInventorySlot(float item)
 {
@@ -82,37 +108,62 @@ void ABasePlayer::SwitchToInventorySlot(float item)
 		print("Whoops we didn't switch to a valid item");
 		break;
 	}
+
+	SetWeaponMesh();
+
 }
 
-void ABasePlayer::SwitchInventoryWithMouseWheel(int val)
+void ABasePlayer::SwitchInventoryWithMouseWheel(float val)
 {
-	if (val == 0) return;
+	if (val == 0.0f) return;
 
-	if (val < 0) SwitchInventoryMouseWheelDown();
+	if (val < 0.0f) SwitchInventoryMouseWheelDown();
 	else		 SwitchInventoryMouseWheelUp();
+
+	SetWeaponMesh();
 
 }
 
 void ABasePlayer::SwitchInventoryMouseWheelUp()
 {
-
+	//Select next item in inventory
+	InventoryGetItem(next);
 }
 
 void ABasePlayer::SwitchInventoryMouseWheelDown()
 {
-
+	//Select previous item in inventory
+	InventoryGetItem(Previous);
 }
+#undef InventoryGetItem
 
-#define RaycastThingy() false
+
 void ABasePlayer::Interact()
 {
 	FHitResult ray;
-	if (RaycastThingy())
+
+	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
+
+#if WITH_EDITOR
+		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Cyan);
+#endif
+
+		AActor *hitObj = ray.GetActor();
+		if (hitObj != nullptr)
+		{
+
+			if (hitObj->Tags.Contains("System"))
+			{
+				//We hit a repairable object if Robert has named this the same
+				Repair(hitObj);
+			}
+
+		}
+
 
 	}
 }
-#undef RaycastThingy
 
 // Called when the game starts or when spawned
 void ABasePlayer::BeginPlay()
@@ -129,43 +180,66 @@ void ABasePlayer::BeginPlay()
 	
 }
 
-//A DEMO CLASS
-//Just so I have some random code to place
-class RepairableObjectTemplate
+
+//A DEMO CLASS THAT WILL BE REMOVED BEFORE MONDAY
+class RepairObjectDemoByNick
 {
 public:
 	int GetType() { return rand() % 3; }
-	void Repiar(float speed) {};
+	void Repair(float f) { }
 };
 
 void ABasePlayer::Repair()
 {
-	//* GET THE ITEM TO REPAIR SOMEWHERE *//
-	print("No way to get the item to repair yet");
-	return;
+	//Just raycast to see if the actor in front of us is repairable
+	//Then we take that object and pass it into another function
+	//Interact();
+	FHitResult ray;
 
-	RepairableObjectTemplate *RepairObject = nullptr; //GetRepiarObject();
+	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
+	{
+		#if WITH_EDITOR
+		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Red);
+		#endif
 
-	switch (RepairObject->GetType())
+		AActor* hitObj = ray.GetActor();
+		if (hitObj != nullptr)
+		{
+			if (hitObj->Tags.Contains("System"))
+			{
+				//We hit a repairable object if Robert has named this the same
+				Repair(hitObj);
+			}
+		}
+	}
+}
+
+void ABasePlayer::Repair(AActor *repairObj)
+{
+
+	RepairObjectDemoByNick* repairObject = nullptr; // Cast<RepairObjectDemoByNick*>(repairObj);
+	if (repairObject == nullptr) return;
+
+	switch (repairObject->GetType())
 	{
 	case 0:
 		print("Engineer Repair");
-		RepairObject->Repiar(classInformation.fEngineeringRepairSpeed);
+		repairObject->Repair(classInformation.fEngineeringRepairSpeed);
 		break;
 
 	case 1:
 		print("Medic Repair?");
-		RepairObject->Repiar(classInformation.fMedicRepairSpeed);
+		repairObject->Repair(classInformation.fMedicRepairSpeed);
 		break;
 
 	case 2:
 		print("Common Repair?");
-		RepairObject->Repiar(classInformation.fCommonRepairSpeed);
+		repairObject->Repair(classInformation.fCommonRepairSpeed);
 		break;
 
 	default:
 		print("Deafult Repair?");
-		RepairObject->Repiar(classInformation.fDefaultRepairSpeed);
+		repairObject->Repair(classInformation.fDefaultRepairSpeed);
 		break;
 	}
 }
@@ -212,7 +286,8 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 
 	//Switching weapon functions
-	PlayerInputComponent->BindAxis("WeaponSelect", this, &ABasePlayer::SwitchToInventorySlot);
+	PlayerInputComponent->BindAxis("WeaponSelectNum", this, &ABasePlayer::SwitchToInventorySlot);
+	PlayerInputComponent->BindAxis("WeaponSelectMouseWheel", this, &ABasePlayer::SwitchInventoryWithMouseWheel);
 
 }
 

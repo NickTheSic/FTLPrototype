@@ -26,6 +26,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		class UCameraComponent* pCameraComponent;
 
+	UPROPERTY(EditAnywhere, Category = "Camera")
+		class USkeletalMeshComponent* pMeshComponent = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+		class USkeletalMeshComponent* pWeaponMesh = nullptr;
+
+
 
 	UPROPERTY()
 		class UUInventory* pInventoryComponent = nullptr; //A nullptr to the Inventory, created later
@@ -33,34 +39,23 @@ public:
 	UPROPERTY()
 		class UHealthComponent* pHealthComponent = nullptr; //A ptr to the Health set to null for now
 
+	UPROPERTY()
+		class URaycastComponent* pRaycastComponent = nullptr;
+
 
 
 	UPROPERTY()
 		class AWeapon* pActiveWeapon = nullptr; //A pointer to the active weapon
 
 
-	UFUNCTION()
-		void UseWeapon(); //A Function to use our pActiveItem
-
-	UFUNCTION()
-		void Interact();
-
-	UFUNCTION()
-		void SwitchToInventorySlot(float item); //A Function to switch our pActiveItem when a number key is pressed
-
-
-	UFUNCTION()
-		void SwitchInventoryWithMouseWheel(int val); //Switch up or down based on the value I guess
-
-	void SwitchInventoryMouseWheelUp();
-	void SwitchInventoryMouseWheelDown();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	//A Repair function
-	void Repair();
+	void Repair(); //Raycasts and finds us the repair object
+	void Repair(AActor *repairObj); //We have an object we already want to repair
 
 public:	
 	// Called every frame
@@ -68,6 +63,8 @@ public:
 
 	UFUNCTION()
 		void OnInteract();
+
+	void SetWeaponMesh();
 
 	UPROPERTY(BlueprintCallable)
 		FPlayerInteractSignature onPlayerInteract;
@@ -77,7 +74,23 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
-	//Probably won't be needed
+	UFUNCTION()
+		void UseWeapon(); //A Function to use our pActiveItem
+
+	UFUNCTION()
+		void Interact();
+
+
+
+	UFUNCTION()
+		void SwitchToInventorySlot(float item); //A Function to switch our pActiveItem when a number key is pressed
+
+	UFUNCTION()
+		void SwitchInventoryWithMouseWheel(float val); //Switch up or down based on the value I guess
+	void SwitchInventoryMouseWheelUp();
+	void SwitchInventoryMouseWheelDown();
+
+
 	UFUNCTION()
 		void MoveRight(float val);
 	UFUNCTION()
@@ -86,8 +99,8 @@ public:
 private:
 
 	bool bHasPopulatedInventory = false; //We only want to populate the inventory once
-	void PopulateInventory();
+	void PopulateInventory();	//Fill the inventory component with our items
 
-	void AddPlayerTags();
+	void AddPlayerTags();		//Add the tags we want to add to the player
 
 };
