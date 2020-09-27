@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Item.h"
+#include "Engine/Engine.h"
 
 // Sets default values
 AItem::AItem()
@@ -25,3 +25,27 @@ void AItem::Tick(float DeltaTime)
 
 }
 
+void AItem::Use()
+{
+
+}
+
+void AItem::StopUse()
+{
+
+}
+
+void AItem::Destroy()
+{
+
+}
+
+void AItem::Enable()
+{
+
+}
+
+void AItem::Disable()
+{
+
+}
