@@ -26,9 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		class UCameraComponent* pCameraComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, Category = "Mesh | Player")
 		class USkeletalMeshComponent* pMeshComponent = nullptr;
-	UPROPERTY(EditAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, Category = "Mesh | Weapon")
 		class USkeletalMeshComponent* pWeaponMesh = nullptr;
 
 
@@ -56,6 +56,8 @@ protected:
 	//A Repair function
 	void Repair(); //Raycasts and finds us the repair object
 	void Repair(AActor *repairObj); //We have an object we already want to repair
+
+	virtual void ClassSpecialty();
 
 public:	
 	// Called every frame

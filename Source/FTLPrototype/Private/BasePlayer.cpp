@@ -62,6 +62,40 @@ ABasePlayer::ABasePlayer()
 
 }
 
+// Called to bind functionality to input
+void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	// Bind jump events
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	//Our main action event
+	// Bind fire event
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABasePlayer::UseWeapon);
+
+	//Interaction
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABasePlayer::Interact);
+
+
+	//Movement
+	PlayerInputComponent->BindAxis("MoveForward", this, &ABasePlayer::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ABasePlayer::MoveRight);
+
+
+	//Turning
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+
+	//Switching weapon functions
+	PlayerInputComponent->BindAxis("WeaponSelectNum", this, &ABasePlayer::SwitchToInventorySlot);
+	PlayerInputComponent->BindAxis("WeaponSelectMouseWheel", this, &ABasePlayer::SwitchInventoryWithMouseWheel);
+
+}
+
+
 #define Use() ;// ->Use;
 void ABasePlayer::UseWeapon()
 {
@@ -71,11 +105,16 @@ void ABasePlayer::UseWeapon()
 		pActiveWeapon Use()
 	}
 }
+#undef Use
 
+
+#define pActiveWeaponGetMesh nullptr; 
 void ABasePlayer::SetWeaponMesh()
 {
-	//pWeaponMesh = pActiveWeapon->GetMesh();
+	pWeaponMesh = pActiveWeaponGetMesh;
 }
+#undef pActiveWeaponGetMesh
+
 
 #define InventoryGetItem(item) nullptr; print( "item selected");
 //Switches to the specific slot in the inventory that was pressed
@@ -142,9 +181,11 @@ void ABasePlayer::Interact()
 {
 	FHitResult ray;
 
+
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
 
+		//Draw a Debug line while in the editor only
 #if WITH_EDITOR
 		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Cyan);
 #endif
@@ -198,6 +239,7 @@ void ABasePlayer::Repair()
 
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
+		//Draw a Debug line while in the editor only
 		#if WITH_EDITOR
 		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Red);
 		#endif
@@ -258,40 +300,6 @@ void ABasePlayer::OnInteract()
 
 }
 
-// Called to bind functionality to input
-void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	// Bind jump events
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
-	//Our main action event
-	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABasePlayer::UseWeapon);
-
-	//Interaction
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABasePlayer::Interact);
-
-
-	//Movement
-	PlayerInputComponent->BindAxis("MoveForward", this, &ABasePlayer::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ABasePlayer::MoveRight);
-
-
-	//Turning
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-
-
-	//Switching weapon functions
-	PlayerInputComponent->BindAxis("WeaponSelectNum", this, &ABasePlayer::SwitchToInventorySlot);
-	PlayerInputComponent->BindAxis("WeaponSelectMouseWheel", this, &ABasePlayer::SwitchInventoryWithMouseWheel);
-
-}
-
-
 void ABasePlayer::MoveRight(float val)
 {
 	if (val != 0.0f)
@@ -305,6 +313,12 @@ void ABasePlayer::MoveForward(float val)
 	{
 		AddMovementInput(GetActorForwardVector(), val);
 	}
+}
+
+
+void ABasePlayer::ClassSpecialty()
+{
+	print("This is the Base Class function which is incomplete");
 }
 
 
@@ -404,7 +418,6 @@ void ABasePlayer::AddPlayerTags()
 	{
 	case PlayerClass::Unknown : 
 		print("The tag being added was not set or Unknown");
-		check(false);
 		break;
 
 	case PlayerClass::Engineer :
