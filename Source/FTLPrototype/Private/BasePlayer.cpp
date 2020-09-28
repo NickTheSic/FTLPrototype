@@ -193,13 +193,11 @@ void ABasePlayer::Interact()
 		AActor *hitObj = ray.GetActor();
 		if (hitObj != nullptr)
 		{
-
 			if (hitObj->Tags.Contains("System"))
 			{
 				//We hit a repairable object if Robert has named this the same
 				Repair(hitObj);
 			}
-
 		}
 
 
@@ -446,7 +444,6 @@ void ABasePlayer::AddPlayerTags()
 		break;
 	}
 }
-
 
 
 #undef print
