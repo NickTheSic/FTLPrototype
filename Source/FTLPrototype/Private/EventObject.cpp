@@ -21,13 +21,13 @@ AEventObject::AEventObject()
 
 	pStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	pStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	pStaticMesh->AttachTo(RootComponent);
+	pStaticMesh->SetupAttachment(RootComponent);
 
 	pActiveMaterial = CreateDefaultSubobject<UMaterial>("ActiveMaterial");
 	pDeactiveMaterial = CreateDefaultSubobject<UMaterial>("DeactiveMaterial");
 
 	pInteractableBox = CreateDefaultSubobject<UInteractableBox>("Collider");
-	pInteractableBox->AttachTo(RootComponent);
+	pInteractableBox->SetupAttachment(RootComponent);
 
 	Tags.Add("SystemEvent");
 
