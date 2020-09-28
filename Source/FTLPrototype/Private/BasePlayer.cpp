@@ -14,7 +14,7 @@
 
 
 #undef print
-#define print(msg) GEngine->AddOnScreenDebugMessage(0, 3, FColor::Red, msg);
+#define print(msg) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, msg);
 
 // Sets default values
 ABasePlayer::ABasePlayer()
@@ -90,7 +90,9 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 
 	//Switching weapon functions
+	 //Should be changed to a BindAction or else it repeats
 	PlayerInputComponent->BindAxis("WeaponSelectNum", this, &ABasePlayer::SwitchToInventorySlot);
+	//This isn't working as I thought it would work
 	PlayerInputComponent->BindAxis("WeaponSelectMouseWheel", this, &ABasePlayer::SwitchInventoryWithMouseWheel);
 
 }
@@ -181,6 +183,7 @@ void ABasePlayer::Interact()
 {
 	FHitResult ray;
 
+	print("Interacting");
 
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
@@ -234,6 +237,8 @@ void ABasePlayer::Repair()
 	//Then we take that object and pass it into another function
 	//Interact();
 	FHitResult ray;
+
+	print("Repairing function");
 
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
