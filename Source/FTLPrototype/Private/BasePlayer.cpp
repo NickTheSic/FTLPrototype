@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
+#include "EventObject.h"
 #include "HealthComponent.h"
 #include "RaycastComponent.h"
 #include "UInventory.h"
@@ -59,7 +60,6 @@ ABasePlayer::ABasePlayer()
 	//Setup the Raycast Component
 	pRaycastComponent = CreateDefaultSubobject<URaycastComponent>("Raycast Component");
 
-
 }
 
 // Called to bind functionality to input
@@ -98,16 +98,14 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 }
 
 
-#define Use() ;// ->Use;
 void ABasePlayer::UseWeapon()
 {
 	if (pActiveWeapon != nullptr)
 	{
 		//Use the weapon
-		pActiveWeapon Use()
+		pActiveWeapon->Use();
 	}
 }
-#undef Use
 
 
 #define pActiveWeaponGetMesh nullptr; 
@@ -159,7 +157,7 @@ void ABasePlayer::SwitchInventoryWithMouseWheel(float val)
 	if (val == 0.0f) return;
 
 	if (val < 0.0f) SwitchInventoryMouseWheelDown();
-	else		 SwitchInventoryMouseWheelUp();
+	else		    SwitchInventoryMouseWheelUp();
 
 	SetWeaponMesh();
 
@@ -187,23 +185,20 @@ void ABasePlayer::Interact()
 
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
-
 		//Draw a Debug line while in the editor only
-#if WITH_EDITOR
+		#if WITH_EDITOR
 		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Cyan);
-#endif
+		#endif
 
 		AActor *hitObj = ray.GetActor();
 		if (hitObj != nullptr)
 		{
-			if (hitObj->Tags.Contains("System"))
+			if (hitObj->Tags.Contains("SystemEvent"))
 			{
 				//We hit a repairable object if Robert has named this the same
 				Repair(hitObj);
 			}
 		}
-
-
 	}
 }
 
@@ -219,17 +214,7 @@ void ABasePlayer::BeginPlay()
 	//Populate the inventory everytime BeginPlay gets called
 	bHasPopulatedInventory = false;
 	PopulateInventory();
-	
 }
-
-
-//A DEMO CLASS THAT WILL BE REMOVED BEFORE MONDAY
-class RepairObjectDemoByNick
-{
-public:
-	int GetType() { return rand() % 3; }
-	void Repair(float f) { }
-};
 
 void ABasePlayer::Repair()
 {
@@ -250,7 +235,7 @@ void ABasePlayer::Repair()
 		AActor* hitObj = ray.GetActor();
 		if (hitObj != nullptr)
 		{
-			if (hitObj->Tags.Contains("System"))
+			if (hitObj->Tags.Contains("SystemEvent"))
 			{
 				//We hit a repairable object if Robert has named this the same
 				Repair(hitObj);
@@ -261,31 +246,18 @@ void ABasePlayer::Repair()
 
 void ABasePlayer::Repair(AActor *repairObj)
 {
+	AEventObject* repairObject =  Cast<AEventObject>(repairObj);
 
-	RepairObjectDemoByNick* repairObject = nullptr; // Cast<RepairObjectDemoByNick*>(repairObj);
-	if (repairObject == nullptr) return;
-
-	switch (repairObject->GetType())
+	if (repairObject == nullptr)
 	{
-	case 0:
-		print("Engineer Repair");
-		repairObject->Repair(classInformation.fEngineeringRepairSpeed);
-		break;
+		print("Repiar object was null");
+		return;
+	}
 
-	case 1:
-		print("Medic Repair?");
-		repairObject->Repair(classInformation.fMedicRepairSpeed);
-		break;
-
-	case 2:
-		print("Common Repair?");
-		repairObject->Repair(classInformation.fCommonRepairSpeed);
-		break;
-
-	default:
-		print("Deafult Repair?");
-		repairObject->Repair(classInformation.fDefaultRepairSpeed);
-		break;
+	if (repairObject->IsActive())
+	{
+		print("Repairing the object");
+		repairObject->Deactivate();
 	}
 }
 
