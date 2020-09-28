@@ -85,12 +85,21 @@ public:
 
 
 	UFUNCTION()
-		void SwitchToInventorySlot(float item); //A Function to switch our pActiveItem when a number key is pressed
+		void SwitchToInventorySlot(int item); //A Function to switch our pActiveItem when a number key is pressed
+	//Individual key press functions
+	UFUNCTION()
+		void SwitchToItemOne() ;  
+	UFUNCTION()
+		void SwitchToItemTwo() ;  
+	UFUNCTION()
+		void SwitchToItemThree();
+	UFUNCTION()
+		void SwitchToItemFour();  
 
 	UFUNCTION()
-		void SwitchInventoryWithMouseWheel(float val); //Switch up or down based on the value I guess
-	void SwitchInventoryMouseWheelUp();
-	void SwitchInventoryMouseWheelDown();
+		void SwitchInventoryMouseWheelUp();
+	UFUNCTION()
+		void SwitchInventoryMouseWheelDown();
 
 
 	UFUNCTION()

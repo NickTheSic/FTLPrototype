@@ -90,10 +90,15 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 
 	//Switching weapon functions
-	 //Should be changed to a BindAction or else it repeats
-	PlayerInputComponent->BindAxis("WeaponSelectNum", this, &ABasePlayer::SwitchToInventorySlot);
+	//Individual Number presses
+	PlayerInputComponent->BindAction("WeaponSelectNum1", IE_Pressed, this, &ABasePlayer::SwitchToItemOne);
+	PlayerInputComponent->BindAction("WeaponSelectNum2", IE_Pressed, this, &ABasePlayer::SwitchToItemTwo);
+	PlayerInputComponent->BindAction("WeaponSelectNum3", IE_Pressed, this, &ABasePlayer::SwitchToItemThree);
+	PlayerInputComponent->BindAction("WeaponSelectNum4", IE_Pressed, this, &ABasePlayer::SwitchToItemFour);
+
 	//This isn't working as I thought it would work
-	PlayerInputComponent->BindAxis("WeaponSelectMouseWheel", this, &ABasePlayer::SwitchInventoryWithMouseWheel);
+	PlayerInputComponent->BindAction("WeaponSelectMouseWheelUp",   IE_Pressed, this, &ABasePlayer::SwitchInventoryMouseWheelUp  );
+	PlayerInputComponent->BindAction("WeaponSelectMouseWheelDown", IE_Pressed, this, &ABasePlayer::SwitchInventoryMouseWheelDown);
 
 }
 
@@ -116,32 +121,31 @@ void ABasePlayer::SetWeaponMesh()
 #undef pActiveWeaponGetMesh
 
 
-#define InventoryGetItem(item) nullptr; print( "item selected");
+#define InventoryGetItem(item) nullptr;
 //Switches to the specific slot in the inventory that was pressed
-void ABasePlayer::SwitchToInventorySlot(float item)
+void ABasePlayer::SwitchToInventorySlot(int val)
 {
-	if (item == 0.0f) return;
-
-	//Cast the item number to an int for the switch statement
-	int val = static_cast<int>(item);
-
 	switch (val)
 	{
 	case 1:
 		//Select the Gun
 		pActiveWeapon = InventoryGetItem(gun);
+		print("Selected Item: Gun ");
 		break;
 	case 2:
 		//Select melee
 		pActiveWeapon = InventoryGetItem(melee);
+		print("Selected Item: Melee ");
 		break;
 	case 3:
 		//Select class item
 		pActiveWeapon = InventoryGetItem(classItem);
+		print("Selected Item: Class Item ");
 		break;
 	case 4:
 		//Select Grenade
 		pActiveWeapon = InventoryGetItem(grenade);
+		print("Selected Item: Grenade");
 		break;
 	default:
 		print("Whoops we didn't switch to a valid item");
@@ -152,27 +156,44 @@ void ABasePlayer::SwitchToInventorySlot(float item)
 
 }
 
-void ABasePlayer::SwitchInventoryWithMouseWheel(float val)
+void ABasePlayer::SwitchToItemOne()
 {
-	if (val == 0.0f) return;
+	print("Switch to item with 1");
+	SwitchToInventorySlot(1);
+}
 
-	if (val < 0.0f) SwitchInventoryMouseWheelDown();
-	else		    SwitchInventoryMouseWheelUp();
+void ABasePlayer::SwitchToItemTwo()
+{
+	print("Switch to item with 2");
+	SwitchToInventorySlot(2);
+}
 
-	SetWeaponMesh();
+void ABasePlayer::SwitchToItemThree()
+{
+	print("Switch to item with 3");
+	SwitchToInventorySlot(3);
+}
 
+void ABasePlayer::SwitchToItemFour()
+{
+	print("Switch to item with 4");
+	SwitchToInventorySlot(4);
 }
 
 void ABasePlayer::SwitchInventoryMouseWheelUp()
 {
 	//Select next item in inventory
 	InventoryGetItem(next);
+	print("Mouse wheel UP select");
+	SetWeaponMesh();
 }
 
 void ABasePlayer::SwitchInventoryMouseWheelDown()
 {
 	//Select previous item in inventory
 	InventoryGetItem(Previous);
+	print("Mouse wheel DOWN select");
+	SetWeaponMesh();
 }
 #undef InventoryGetItem
 
@@ -181,7 +202,7 @@ void ABasePlayer::Interact()
 {
 	FHitResult ray;
 
-	print("Interacting");
+	print("Interact function entered");
 
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
@@ -206,6 +227,9 @@ void ABasePlayer::Interact()
 void ABasePlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//They are binding the Gun here in the Prototype
+	pWeaponMesh->AttachToComponent(pMeshComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	//A Function to add the tag automatically in case I forget
 	AddPlayerTags();
