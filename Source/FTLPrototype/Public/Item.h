@@ -23,4 +23,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//For when an item is used/done being used I.e. pressing a button
+	virtual void Use();
+	virtual void StopUse();
+
+	//In case we need to obliterate an item from existance
+	virtual void Destroy();
+
+	//To turn on/off items, to hide/show items, and whatever else you'd want switched on/off
+	virtual void Enable();
+	virtual void Disable();
+
 };
