@@ -12,6 +12,7 @@
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "DrawDebugHelpers.h"
+#include "Public/EventObject.h"
 
 
 #include "RaycastComponent.h"
@@ -118,8 +119,18 @@ void AFTLPrototypeCharacter::OnInteract()
 	{
 		for (auto& ray : rays)
 		{
-			if (ray.GetActor()->Tags.Contains("White"))
-				ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 150.0f);
+			if (ray.GetActor()->ActorHasTag("SystemEvent"))
+			{
+				AEventObject* pEventObject = Cast<AEventObject>(ray.GetActor());
+				if (pEventObject)
+				{
+					if (pEventObject->IsActive())
+					{
+						pEventObject->Deactivate();
+					}
+				}
+				//ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 150.0f);
+			}
 		}
 		//if (ray.GetActor()->Tags.Contains("White"))
 		//	ray.GetActor()->SetActorLocation(ray.GetActor()->GetActorLocation() + FVector::UpVector * 20);
