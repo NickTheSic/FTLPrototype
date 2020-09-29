@@ -62,6 +62,39 @@ ABasePlayer::ABasePlayer()
 
 }
 
+
+// Called when the game starts or when spawned
+void ABasePlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//They are binding the Gun here in the Prototype
+	pWeaponMesh->AttachToComponent(pMeshComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+
+	//A Function to add the tag automatically in case I forget
+	AddPlayerTags();
+
+
+	//Populate the inventory everytime BeginPlay gets called
+	bHasPopulatedInventory = false;
+	PopulateInventory();
+}
+
+
+// Called every frame
+void ABasePlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+
+void ABasePlayer::ClassSpecialty()
+{
+	print("This is the Base Class function which is incomplete");
+}
+
+
 // Called to bind functionality to input
 void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -110,51 +143,12 @@ void ABasePlayer::UseWeapon()
 		//Use the weapon
 		pActiveWeapon->Use();
 	}
-}
-
-
-#define pActiveWeaponGetMesh nullptr; 
-void ABasePlayer::SetWeaponMesh()
-{
-	pWeaponMesh = pActiveWeaponGetMesh;
-}
-#undef pActiveWeaponGetMesh
-
-
-#define InventoryGetItem(item) nullptr;
-//Switches to the specific slot in the inventory that was pressed
-void ABasePlayer::SwitchToInventorySlot(int val)
-{
-	switch (val)
+	else
 	{
-	case 1:
-		//Select the Gun
-		pActiveWeapon = InventoryGetItem(gun);
-		print("Selected Item: Gun ");
-		break;
-	case 2:
-		//Select melee
-		pActiveWeapon = InventoryGetItem(melee);
-		print("Selected Item: Melee ");
-		break;
-	case 3:
-		//Select class item
-		pActiveWeapon = InventoryGetItem(classItem);
-		print("Selected Item: Class Item ");
-		break;
-	case 4:
-		//Select Grenade
-		pActiveWeapon = InventoryGetItem(grenade);
-		print("Selected Item: Grenade");
-		break;
-	default:
-		print("Whoops we didn't switch to a valid item");
-		break;
+		print("Active weapon was null while trying to use");
 	}
-
-	SetWeaponMesh();
-
 }
+
 
 void ABasePlayer::SwitchToItemOne()
 {
@@ -180,10 +174,46 @@ void ABasePlayer::SwitchToItemFour()
 	SwitchToInventorySlot(4);
 }
 
+#define InventoryGetItem(item) nullptr; // Cast<AWeapon>(pInventoryComponent->GetItem(item));
+//Switches to the specific slot in the inventory that was pressed
+void ABasePlayer::SwitchToInventorySlot(int val)
+{
+	switch (val)
+	{
+	case 1:
+		//Select the Gun
+		pActiveWeapon = InventoryGetItem(val - 1);
+		print("Selected Item: Gun ");
+		break;
+	case 2:
+		//Select melee
+		pActiveWeapon = InventoryGetItem(val - 1);
+		print("Selected Item: Melee ");
+		break;
+	case 3:
+		//Select class item
+		pActiveWeapon = InventoryGetItem(val - 1);
+		print("Selected Item: Class Item ");
+		break;
+	case 4:
+		//Select Grenade
+		pActiveWeapon = InventoryGetItem(val - 1);
+		print("Selected Item: Grenade");
+		break;
+	default:
+		print("Whoops we didn't switch to a valid item");
+		break;
+	}
+
+	SetWeaponMesh();
+
+}
+
+
 void ABasePlayer::SwitchInventoryMouseWheelUp()
 {
 	//Select next item in inventory
-	InventoryGetItem(next);
+	pActiveWeapon = nullptr; // Cast<AWeapon>(pInventoryComponent->GetNext());
 	print("Mouse wheel UP select");
 	SetWeaponMesh();
 }
@@ -191,7 +221,7 @@ void ABasePlayer::SwitchInventoryMouseWheelUp()
 void ABasePlayer::SwitchInventoryMouseWheelDown()
 {
 	//Select previous item in inventory
-	InventoryGetItem(Previous);
+	pActiveWeapon = nullptr; // Cast<AWeapon>(pInventoryComponent->GetPrev());
 	print("Mouse wheel DOWN select");
 	SetWeaponMesh();
 }
@@ -223,22 +253,6 @@ void ABasePlayer::Interact()
 	}
 }
 
-// Called when the game starts or when spawned
-void ABasePlayer::BeginPlay()
-{
-	Super::BeginPlay();
-
-	//They are binding the Gun here in the Prototype
-	pWeaponMesh->AttachToComponent(pMeshComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-
-	//A Function to add the tag automatically in case I forget
-	AddPlayerTags();
-
-
-	//Populate the inventory everytime BeginPlay gets called
-	bHasPopulatedInventory = false;
-	PopulateInventory();
-}
 
 void ABasePlayer::Repair()
 {
@@ -285,12 +299,6 @@ void ABasePlayer::Repair(AActor *repairObj)
 	}
 }
 
-// Called every frame
-void ABasePlayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
 void ABasePlayer::OnInteract()
 {
@@ -315,15 +323,9 @@ void ABasePlayer::MoveForward(float val)
 }
 
 
-void ABasePlayer::ClassSpecialty()
-{
-	print("This is the Base Class function which is incomplete");
-}
-
-
 //I am not sure how the inventory is going to work
 //Putting this here to quickly and easily change it all at once
-#define AddToInventory(item); ;
+#define AddToInventory(item); pInventoryComponent->AddItemToInventory(item);
 
 void ABasePlayer::PopulateInventory()
 {
@@ -445,6 +447,14 @@ void ABasePlayer::AddPlayerTags()
 		break;
 	}
 }
+
+
+#define pActiveWeaponGetMesh nullptr; 
+void ABasePlayer::SetWeaponMesh()
+{
+	pWeaponMesh = pActiveWeaponGetMesh;
+}
+#undef pActiveWeaponGetMesh
 
 
 #undef print
