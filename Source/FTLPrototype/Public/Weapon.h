@@ -15,31 +15,35 @@ class FTLPROTOTYPE_API AWeapon : public AItem
 	GENERATED_BODY()
 
 public:
-	//sets defaults, calls parent constructor?
+	//sets defaults
 	AWeapon();
 
 protected:
-	bool bIsFiring;				//if the weapon is firing/attacking
-	
-	uint64 uiMagAmmo;			//ammo currently in the magazine
-	uint64 uiMaxMagAmmo;		//maximum amount of ammo you can have in your magazine
-	
-	int iReserveAmmo;			//ammo pool to draw from (-1 for infinite ammo supply)
-	uint64 uiMaxReserveAmmo;	//maximum amount of ammo you can have in your ammo pool
+	//Can be edited anywhere, reads/writes from blueprint, under weapon stats, allows private variables to be accessed
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		bool bIsFiring;				//if the weapon is firing/attacking
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		bool bIsAutomatic;			//if the weapon's trigger can be held or has to be pulled every shot I.e. Machine Gun vs Pistol
 
-	float fReloadTime;			//Time it takes to reload (attack cooldown for melee)
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		uint64 uiMagAmmo;			//ammo currently in the magazine
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		uint64 uiMaxMagAmmo;		//maximum amount of ammo you can have in your magazine
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		int iReserveAmmo;			//ammo pool to draw from (-1 for infinite ammo supply)
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		uint64 uiMaxReserveAmmo;	//maximum amount of ammo you can have in your ammo pool
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		float fReloadTime;			//Time it takes to reload
+	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
+		float fFireRate;			//How many shots per second (1.0f / firerate on shoot timer)
 
 public:
-	//For when an item is used/done being used I.e. pressing a button
-	virtual void Use() override;
-	virtual void StopUse() override;
 
-	//In case we need to obliterate an item from existance
-	virtual void Destroy() override;
-
-	//To turn on/off items, to hide/show items, and whatever else you'd want switched on/off
-	virtual void Enable() override;
-	virtual void Disable() override;
+	FTimerHandle attackTimer;
+	FTimerHandle reloadTimer;
 
 	//For handling behaviour before, during, and after shooting
 	virtual void FireStart();
@@ -47,5 +51,16 @@ public:
 	virtual void FireEnd();
 
 	//For reloading the weapon
+	virtual void ReloadStart();
 	virtual void Reload();
+	virtual void ReloadEnd();
+
+	//Type of weapon you're using (just in case we need it somewhere)
+	enum WeaponType
+	{
+		Weapon,		//Default
+		Gun,		//Gun
+		Melee,		//Melee
+		Grenade		//Grenade
+	};
 };

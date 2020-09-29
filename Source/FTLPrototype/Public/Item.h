@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/BoxComponent.h"
 #include "Item.generated.h"
 
 UCLASS()
@@ -18,6 +20,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+		USkeletalMeshComponent* pSkeletalMesh;
+	UPROPERTY(EditAnywhere, Category = "HitBox", meta = (AllowPrivateAccess = "true"))
+		UBoxComponent* pHitBox;
 
 public:	
 	// Called every frame
@@ -34,4 +41,6 @@ public:
 	virtual void Enable();
 	virtual void Disable();
 
+	//Returns mesh 
+	virtual USkeletalMeshComponent* GetMesh() { return pSkeletalMesh; };
 };
