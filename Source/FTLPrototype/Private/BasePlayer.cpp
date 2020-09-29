@@ -342,10 +342,10 @@ void ABasePlayer::PopulateInventory()
 	FActorSpawnParameters spawnParams;	//Just basic spawnParams
 
 
-	if (classInformation.gunItemTemplate != nullptr)
+	if (classInformation.weaponInformation.gunItemTemplate != nullptr)
 	{
 		//Create the GunItem
-		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.gunItemTemplate, spawnParams);
+		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.weaponInformation.gunItemTemplate, spawnParams);
 
 		//Add it to inventory
 		AddToInventory(gun);
@@ -358,10 +358,10 @@ void ABasePlayer::PopulateInventory()
 	}
 
 
-	if (classInformation.meleeItemTemplate != nullptr)
+	if (classInformation.weaponInformation.meleeItemTemplate != nullptr)
 	{
 		//Create the Melee item
-		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.meleeItemTemplate, spawnParams);
+		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.weaponInformation.meleeItemTemplate, spawnParams);
 
 		//Add it to inventory
 		AddToInventory(melee);
@@ -374,10 +374,10 @@ void ABasePlayer::PopulateInventory()
 	}
 
 
-	if (classInformation.classItemTemplate != nullptr)
+	if (classInformation.weaponInformation.classItemTemplate != nullptr)
 	{
 		//Create the Class item
-		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.classItemTemplate, spawnParams);
+		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.weaponInformation.classItemTemplate, spawnParams);
 
 		//Add it to inventory
 		AddToInventory(classItem);
@@ -390,10 +390,10 @@ void ABasePlayer::PopulateInventory()
 	}
 
 
-	if (classInformation.grenadeItemTemplate != nullptr)
+	if (classInformation.weaponInformation.grenadeItemTemplate != nullptr)
 	{
 		//Create the Class item
-		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.grenadeItemTemplate, spawnParams);
+		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.weaponInformation.grenadeItemTemplate, spawnParams);
 
 		//Add it to inventory
 		AddToInventory(grenade);
