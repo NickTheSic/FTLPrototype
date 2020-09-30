@@ -199,22 +199,22 @@ void ABasePlayer::SwitchToInventorySlot(int val)
 	case 1:
 		//Select the Gun
 		pActiveWeapon = pInventoryComponent->GunItem;
-		weaponat = item;
+		weaponat = val;
 		break;
 	case 2:
 		//Select melee
 		pActiveWeapon = pInventoryComponent->MeleeItem;
-		weaponat = item;
+		weaponat = val;
 		break;
 	case 3:
 		//Select class item
 		pActiveWeapon = pInventoryComponent->ClassItem;
-		weaponat = item;
+		weaponat = val;
 		break;
 	case 4:
 		//Select Grenade
 		pActiveWeapon = pInventoryComponent->GrenadeItemClass;
-		weaponat = item;
+		weaponat = val;
 		break;
 	default:
 		print("Whoops we didn't switch to a valid item");

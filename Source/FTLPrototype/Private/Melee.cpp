@@ -24,7 +24,7 @@ void AMelee::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
 
-    if (bIsFiring == false)
+    if (bIsFiring == false && 0)
     {
         FireStart();
     }
@@ -79,7 +79,7 @@ void AMelee::Fire()
         //}
 
 
-        GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Green, hit.GetActor()->GetFName().ToString());
+        //GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Green, hit.GetActor()->GetFName().ToString());
         DrawDebugLine(GetWorld(), hit.TraceStart, hit.TraceEnd, FColor::Green, true);
         //FPrimitiveDrawInterface::DrawLine(hit.TraceStart, hit.TraceEnd, FLinearColor::Green, 0, 2.0f, 2.0f, true);
     }

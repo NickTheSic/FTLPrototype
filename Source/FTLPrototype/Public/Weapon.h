@@ -46,6 +46,9 @@ protected:
 
 public:
 
+	UFUNCTION(BlueprintCallable)
+		FString GetCurrentMagAmmoString();
+
 	FTimerHandle attackTimer;
 	FTimerHandle reloadTimer;
 

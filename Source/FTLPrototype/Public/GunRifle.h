@@ -14,6 +14,9 @@ UCLASS()
 class FTLPROTOTYPE_API AGunRifle : public AWeapon
 {
 	GENERATED_BODY()
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TSubclassOf<class UDamageType> DamageType;
 
 public:
 	AGunRifle();
@@ -21,6 +24,8 @@ public:
 	virtual void Tick(float deltaTime) override;
 
 	URaycastComponent* pRayCast;
+
+
 
 	//For handling behaviour before, during, and after shooting
 	virtual void FireStart() override;

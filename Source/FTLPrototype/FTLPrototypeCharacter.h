@@ -55,7 +55,7 @@ class AFTLPrototypeCharacter : public ACharacter
 
 		UPROPERTY()
 			class UUInventory* pInventoryComponent = nullptr;
-
+		
 		UPROPERTY()
 			class AWeapon* pActiveWeapon = nullptr;
 
@@ -63,6 +63,8 @@ class AFTLPrototypeCharacter : public ACharacter
 
 public:
 	AFTLPrototypeCharacter();
+	UFUNCTION(BlueprintCallable)
+		AWeapon* GetCurrentWeapon();
 
 protected:
 	virtual void BeginPlay();
@@ -101,6 +103,7 @@ protected:
 	
 	/** Fires a projectile. */
 	void OnFire();
+	void EndFire();
 
 	/** Reloads current weapon. */
 	void Reload();
@@ -159,6 +162,8 @@ public:
 
 	void SetWeaponMesh();
 
+	URaycastComponent* GetRaycastComponent();
+
 	UFUNCTION()
 		void SwitchToInventorySlot(float item); //A Function to switch our pActiveItem when a number key is pressed
 
@@ -184,6 +189,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	bool bDied;
+
+public:
+	UFUNCTION(BlueprintCallable)
+		UFTLPrototypeHealthComponent* GetHealthComponent();
 
 };
 

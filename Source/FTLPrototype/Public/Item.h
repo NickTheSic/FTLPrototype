@@ -30,6 +30,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	//For when an item is used/done being used I.e. pressing a button
+public:
 	virtual void Use();
 	virtual void StopUse();
 

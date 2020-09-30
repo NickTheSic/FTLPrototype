@@ -102,6 +102,11 @@ AFTLPrototypeCharacter::AFTLPrototypeCharacter()
 	pInventoryComponent = CreateDefaultSubobject<UUInventory>("Inventory Component");
 }
 
+AWeapon * AFTLPrototypeCharacter::GetCurrentWeapon()
+{
+	return pActiveWeapon;
+}
+
 void AFTLPrototypeCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -172,10 +177,13 @@ void AFTLPrototypeCharacter::PopulateInventory()
 	FActorSpawnParameters spawnParams;	//Just basic spawnParams
 
 
-	if (classInformation.gunItemTemplate != nullptr)
+	if (classInformation.weaponInformation.gunItemTemplate != nullptr)
 	{
 		//Create the GunItem
-		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.gunItemTemplate, spawnParams);
+		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.weaponInformation.gunItemTemplate, spawnParams);
+		gun->SetOwner(this);
+		if (pActiveWeapon == nullptr)
+			pActiveWeapon = gun;
 
 		//Add it to inventory
 		pInventoryComponent->GunItem = gun;
@@ -188,11 +196,13 @@ void AFTLPrototypeCharacter::PopulateInventory()
 	}
 
 
-	if (classInformation.meleeItemTemplate != nullptr)
+	if (classInformation.weaponInformation.meleeItemTemplate != nullptr)
 	{
 		//Create the Melee item
-		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.meleeItemTemplate, spawnParams);
-
+		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.weaponInformation.meleeItemTemplate, spawnParams);
+		melee->SetOwner(this);
+		if (pActiveWeapon == nullptr)
+			pActiveWeapon = melee;
 		//Add it to inventory
 		pInventoryComponent->MeleeItem = melee;
 		//pInventoryComponent->AddItem(melee);
@@ -204,11 +214,13 @@ void AFTLPrototypeCharacter::PopulateInventory()
 	}
 
 
-	if (classInformation.classItemTemplate != nullptr)
+	if (classInformation.weaponInformation.classItemTemplate != nullptr)
 	{
 		//Create the Class item
-		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.classItemTemplate, spawnParams);
-
+		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.weaponInformation.classItemTemplate, spawnParams);
+		classItem->SetOwner(this);
+		if (pActiveWeapon == nullptr)
+			pActiveWeapon = classItem;
 		//Add it to inventory
 		pInventoryComponent->ClassItem = classItem;
 		//pInventoryComponent->AddItem(classItem);
@@ -220,10 +232,10 @@ void AFTLPrototypeCharacter::PopulateInventory()
 	}
 
 
-	if (classInformation.grenadeItemTemplate != nullptr)
+	if (classInformation.weaponInformation.grenadeItemTemplate != nullptr)
 	{
 		//Create the Class item
-		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.grenadeItemTemplate, spawnParams);
+		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.weaponInformation.grenadeItemTemplate, spawnParams);
 
 		//Add it to inventory
 		pInventoryComponent->GrenadeItemClass = grenade;
@@ -252,6 +264,9 @@ void AFTLPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFTLPrototypeCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFTLPrototypeCharacter::EndFire);
+
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFTLPrototypeCharacter::Reload);
 
 	// Bind reload event
 	//PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFTLPrototypeCharacter::Reload);
@@ -326,11 +341,23 @@ void AFTLPrototypeCharacter::OnFire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
+
+	if (pActiveWeapon != nullptr)
+		pActiveWeapon->FireStart();
+
+}
+
+void AFTLPrototypeCharacter::EndFire()
+{
+	if (pActiveWeapon != nullptr)
+		pActiveWeapon->FireEnd();
 }
 
 void AFTLPrototypeCharacter::Reload()
 {
 	//Call ReloadStart() on current weapon
+	if (pActiveWeapon != nullptr)
+		pActiveWeapon->ReloadStart();
 }
 
 void AFTLPrototypeCharacter::OnResetVR()
@@ -449,7 +476,12 @@ bool AFTLPrototypeCharacter::EnableTouchscreenMovement(class UInputComponent* Pl
 
 void AFTLPrototypeCharacter::SetWeaponMesh()
 {
-	FP_Gun.me = pActiveWeapon->GetMesh();
+	//FP_Gun->SetSkeletalMesh(pActiveWeapon->GetMesh());
+}
+
+URaycastComponent * AFTLPrototypeCharacter::GetRaycastComponent()
+{
+	return pRaycastComponent;
 }
 
 void AFTLPrototypeCharacter::SwitchToInventorySlot(float item)
@@ -499,6 +531,7 @@ void AFTLPrototypeCharacter::SwitchInventoryMouseWheelUp()
 
 void AFTLPrototypeCharacter::SwitchInventoryMouseWheelDown()
 {
+}
 	
 void AFTLPrototypeCharacter::OnHealthChanged(UFTLPrototypeHealthComponent* InHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
@@ -515,4 +548,9 @@ void AFTLPrototypeCharacter::OnHealthChanged(UFTLPrototypeHealthComponent* InHea
 		SetLifeSpan(10.0f);
 	}
 	
+}
+
+UFTLPrototypeHealthComponent * AFTLPrototypeCharacter::GetHealthComponent()
+{
+	return HealthComp;
 }

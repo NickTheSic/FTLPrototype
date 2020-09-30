@@ -4,6 +4,8 @@
 #include "DrawDebugHelpers.h"
 #include "EnemyBase.h"
 #include "GunRifle.h"
+#include "../FTLPrototypeCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 AGunRifle::AGunRifle()
 {
@@ -55,11 +57,22 @@ void AGunRifle::Fire()
         
         //Raycast shenanigans
         FHitResult hit;
-        pRayCast->RaycastSingle(hit, 
+        /*pRayCast->RaycastSingle(hit, 
             GetActorLocation(),                 //raycast was coming out the side for some reason, the + 90 seems to fix
             FRotator(GetActorRotation().Pitch, GetActorRotation().Yaw + 90.0f, GetActorRotation().Roll), 
             3000.0f, 
-            FCollisionObjectQueryParams::AllObjects);
+            FCollisionObjectQueryParams::AllObjects);*/
+		AFTLPrototypeCharacter* character = Cast<AFTLPrototypeCharacter>(GetOwner());
+		if (character != nullptr)
+		{
+			character->GetRaycastComponent()->RaycastSingleFromPlayer(hit, 3000.0f, FCollisionObjectQueryParams::AllObjects);
+		}
+
+		 //pRayCast->RaycastSingle(hit, 
+   //         GetActorLocation(),                 //raycast was coming out the side for some reason, the + 90 seems to fix
+   //         FRotator(GetActorRotation().Pitch, GetActorRotation().Yaw + 90.0f, GetActorRotation().Roll), 
+   //         3000.0f, 
+   //         "Raycastable");
 
         if (hit.GetActor() == nullptr)
         {
@@ -78,6 +91,9 @@ void AGunRifle::Fire()
 
             GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Green, hit.GetActor()->GetFName().ToString());
             DrawDebugLine(GetWorld(), hit.TraceStart, hit.TraceEnd, FColor::Green, true);
+			UGameplayStatics::ApplyDamage(hit.GetActor(), 25.0f, character->GetController(), GetOwner(), DamageType);
+			//UGameplayStatics::ApplyPointDamage(hit.GetActor(), BaseDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
+
             //FPrimitiveDrawInterface::DrawLine(hit.TraceStart, hit.TraceEnd, FLinearColor::Green, 0, 2.0f, 2.0f, true);
         }
     }

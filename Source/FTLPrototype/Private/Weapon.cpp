@@ -26,6 +26,11 @@ void AWeapon::Tick(float deltaTime)
     Super::Tick(deltaTime);
 }
 
+FString AWeapon::GetCurrentMagAmmoString()
+{
+	return FString::Printf(TEXT("%llu"), uiMagAmmo);
+}
+
 void AWeapon::FireStart()
 {
     //Beginning code for firing

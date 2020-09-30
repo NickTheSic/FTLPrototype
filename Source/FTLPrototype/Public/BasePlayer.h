@@ -44,7 +44,7 @@ public:
 	UPROPERTY()
 		class AWeapon* pActiveWeapon = nullptr; //A pointer to the active weapon
 
-	float weaponat = 0.0f;
+	int weaponat = 0;
 
 
 protected:
