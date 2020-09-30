@@ -13,6 +13,8 @@
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "DrawDebugHelpers.h"
 #include "Public/EventObject.h"
+#include "Weapon.h"
+#include "UInventory.h"
 
 
 #include "RaycastComponent.h"
@@ -89,6 +91,9 @@ AFTLPrototypeCharacter::AFTLPrototypeCharacter()
 
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
+
+	//Setup the Inventory Component
+	pInventoryComponent = CreateDefaultSubobject<UUInventory>("Inventory Component");
 }
 
 void AFTLPrototypeCharacter::BeginPlay()
@@ -109,7 +114,10 @@ void AFTLPrototypeCharacter::BeginPlay()
 	{
 		VR_Gun->SetHiddenInGame(true, true);
 		Mesh1P->SetHiddenInGame(false, true);
+
 	}
+
+	PopulateInventory();
 }
 
 void AFTLPrototypeCharacter::OnInteract()
@@ -142,6 +150,86 @@ void AFTLPrototypeCharacter::OnInteract()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
+void AFTLPrototypeCharacter::PopulateInventory()
+{
+	if (bHasPopulatedInventory)
+	{
+		return; //We don't want to repopulate the inventory more than once do we?
+	}
+
+
+	UWorld* world = GetWorld();	//Get the world
+	FActorSpawnParameters spawnParams;	//Just basic spawnParams
+
+
+	if (classInformation.gunItemTemplate != nullptr)
+	{
+		//Create the GunItem
+		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.gunItemTemplate, spawnParams);
+
+		//Add it to inventory
+		pInventoryComponent->GunItem = gun;
+		//pInventoryComponent->AddItem(gun);
+		//pInventoryComponent->pGunItem = gun;
+	}
+	else
+	{
+		//print("No Gun Item");
+	}
+
+
+	if (classInformation.meleeItemTemplate != nullptr)
+	{
+		//Create the Melee item
+		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.meleeItemTemplate, spawnParams);
+
+		//Add it to inventory
+		pInventoryComponent->MeleeItem = melee;
+		//pInventoryComponent->AddItem(melee);
+		//pInventoryComponent->pMeleeItem = melee;
+	}
+	else
+	{
+		//print("No Melee Item");
+	}
+
+
+	if (classInformation.classItemTemplate != nullptr)
+	{
+		//Create the Class item
+		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.classItemTemplate, spawnParams);
+
+		//Add it to inventory
+		pInventoryComponent->ClassItem = classItem;
+		//pInventoryComponent->AddItem(classItem);
+		//pInventoryComponent->pClassItem = classItem;
+	}
+	else
+	{
+		//	print("No class Item");
+	}
+
+
+	if (classInformation.grenadeItemTemplate != nullptr)
+	{
+		//Create the Class item
+		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.grenadeItemTemplate, spawnParams);
+
+		//Add it to inventory
+		pInventoryComponent->GrenadeItemClass = grenade;
+		//pInventoryComponent->AddItem(grenade);
+		//pInventoryComponent->pGrenadeItem = grenade;
+	}
+	else
+	{
+		//	print("No grenade Item");
+	}
+
+
+	//We have populated the inventory
+	bHasPopulatedInventory = true;
+}
+
 void AFTLPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// set up gameplay key bindings
@@ -171,6 +259,10 @@ void AFTLPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("TurnRate", this, &AFTLPrototypeCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AFTLPrototypeCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAxis("WeaponSelectNum", this, &AFTLPrototypeCharacter::SwitchToInventorySlot);
+	//This isn't working as I thought it would work
+	PlayerInputComponent->BindAxis("WeaponSelectMouseWheel", this, &AFTLPrototypeCharacter::SwitchInventoryWithMouseWheel);
 }
 
 void AFTLPrototypeCharacter::OnFire()
@@ -332,4 +424,58 @@ bool AFTLPrototypeCharacter::EnableTouchscreenMovement(class UInputComponent* Pl
 	}
 	
 	return false;
+}
+
+void AFTLPrototypeCharacter::SetWeaponMesh()
+{
+	FP_Gun.me = pActiveWeapon->GetMesh();
+}
+
+void AFTLPrototypeCharacter::SwitchToInventorySlot(float item)
+{
+	if (item == 0.0f) return;
+
+	//Cast the item number to an int for the switch statement
+	int val = static_cast<int>(item);
+
+	switch (val)
+	{
+	case 1:
+		//Select the Gun
+		pActiveWeapon = pInventoryComponent->GunItem;
+		weaponat = item;
+		break;
+	case 2:
+		//Select melee
+		pActiveWeapon = pInventoryComponent->MeleeItem;
+		weaponat = item;
+		break;
+	case 3:
+		//Select class item
+		pActiveWeapon = pInventoryComponent->ClassItem;
+		weaponat = item;
+		break;
+	case 4:
+		//Select Grenade
+		pActiveWeapon = pInventoryComponent->GrenadeItemClass;
+		weaponat = item;
+		break;
+	default:
+		//print("Whoops we didn't switch to a valid item");
+		break;
+	}
+
+	SetWeaponMesh();
+}
+
+void AFTLPrototypeCharacter::SwitchInventoryWithMouseWheel(float val)
+{
+}
+
+void AFTLPrototypeCharacter::SwitchInventoryMouseWheelUp()
+{
+}
+
+void AFTLPrototypeCharacter::SwitchInventoryMouseWheelDown()
+{
 }

@@ -4,14 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/BoxComponent.h"
 #include "Item.generated.h"
 
 UCLASS()
 class FTLPROTOTYPE_API AItem : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AItem();
 
@@ -19,7 +21,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+	UPROPERTY(EditAnywhere, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+		USkeletalMeshComponent* pSkeletalMesh;
+	UPROPERTY(EditAnywhere, Category = "HitBox", meta = (AllowPrivateAccess = "true"))
+		UBoxComponent* pHitBox;
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -34,4 +41,6 @@ public:
 	virtual void Enable();
 	virtual void Disable();
 
+	//Returns mesh 
+	virtual USkeletalMeshComponent* GetMesh() { return pSkeletalMesh; };
 };

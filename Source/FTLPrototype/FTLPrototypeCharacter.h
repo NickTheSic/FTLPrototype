@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PlayerClassInformation.h"
 #include "FTLPrototypeCharacter.generated.h"
 
 class UInputComponent;
@@ -45,7 +46,19 @@ class AFTLPrototypeCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
 
+	UPROPERTY(EditAnywhere, Category = "Class Information")
+		FClassInformation classInformation; //A Struct to hold all the class specific information
+
 		class URaycastComponent* pRaycastComponent;
+		bool bHasPopulatedInventory = false; //We only want to populate the inventory once
+
+		UPROPERTY()
+			class UUInventory* pInventoryComponent = nullptr;
+
+		UPROPERTY()
+			class AWeapon* pActiveWeapon = nullptr;
+
+		float weaponat = 0.0f;
 
 public:
 	AFTLPrototypeCharacter();
@@ -81,6 +94,7 @@ public:
 	/** Whether to use motion controller location for aiming. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
+
 
 protected:
 	
@@ -123,6 +137,7 @@ protected:
 	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
 	
+	void PopulateInventory();
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -137,6 +152,18 @@ protected:
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
 
 public:
+
+	void SetWeaponMesh();
+
+	UFUNCTION()
+		void SwitchToInventorySlot(float item); //A Function to switch our pActiveItem when a number key is pressed
+
+	UFUNCTION()
+		void SwitchInventoryWithMouseWheel(float val); //Switch up or down based on the value I guess
+	void SwitchInventoryMouseWheelUp();
+	void SwitchInventoryMouseWheelDown();
+
+
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/

@@ -19,7 +19,7 @@
 // Sets default values
 ABasePlayer::ABasePlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Setup Collider
@@ -58,7 +58,6 @@ ABasePlayer::ABasePlayer()
 
 	//Setup the Raycast Component
 	pRaycastComponent = CreateDefaultSubobject<URaycastComponent>("Raycast Component");
-
 
 }
 
@@ -131,19 +130,23 @@ void ABasePlayer::SwitchToInventorySlot(float item)
 	{
 	case 1:
 		//Select the Gun
-		pActiveWeapon = InventoryGetItem(gun);
+		pActiveWeapon = pInventoryComponent->GunItem;
+		weaponat = item;
 		break;
 	case 2:
 		//Select melee
-		pActiveWeapon = InventoryGetItem(melee);
+		pActiveWeapon = pInventoryComponent->MeleeItem;
+		weaponat = item;
 		break;
 	case 3:
 		//Select class item
-		pActiveWeapon = InventoryGetItem(classItem);
+		pActiveWeapon = pInventoryComponent->ClassItem;
+		weaponat = item;
 		break;
 	case 4:
 		//Select Grenade
-		pActiveWeapon = InventoryGetItem(grenade);
+		pActiveWeapon = pInventoryComponent->GrenadeItemClass;
+		weaponat = item;
 		break;
 	default:
 		print("Whoops we didn't switch to a valid item");
@@ -168,13 +171,30 @@ void ABasePlayer::SwitchInventoryWithMouseWheel(float val)
 void ABasePlayer::SwitchInventoryMouseWheelUp()
 {
 	//Select next item in inventory
-	InventoryGetItem(next);
+
+	if (weaponat < 4)
+	{
+		weaponat++;
+	}
+	else
+	{
+		weaponat = 1;
+	}
+		SwitchToInventorySlot(weaponat);	
 }
 
 void ABasePlayer::SwitchInventoryMouseWheelDown()
 {
 	//Select previous item in inventory
-	InventoryGetItem(Previous);
+	if (weaponat == 1)
+	{
+		weaponat = 4;
+	}
+	else
+	{
+		weaponat--;
+	}
+	SwitchToInventorySlot(weaponat);
 }
 #undef InventoryGetItem
 
@@ -193,7 +213,7 @@ void ABasePlayer::Interact()
 		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Cyan);
 #endif
 
-		AActor *hitObj = ray.GetActor();
+		AActor* hitObj = ray.GetActor();
 		if (hitObj != nullptr)
 		{
 			if (hitObj->Tags.Contains("System"))
@@ -219,7 +239,7 @@ void ABasePlayer::BeginPlay()
 	//Populate the inventory everytime BeginPlay gets called
 	bHasPopulatedInventory = false;
 	PopulateInventory();
-	
+
 }
 
 
@@ -243,9 +263,9 @@ void ABasePlayer::Repair()
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
 		//Draw a Debug line while in the editor only
-		#if WITH_EDITOR
+#if WITH_EDITOR
 		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Red);
-		#endif
+#endif
 
 		AActor* hitObj = ray.GetActor();
 		if (hitObj != nullptr)
@@ -259,7 +279,7 @@ void ABasePlayer::Repair()
 	}
 }
 
-void ABasePlayer::Repair(AActor *repairObj)
+void ABasePlayer::Repair(AActor* repairObj)
 {
 
 	RepairObjectDemoByNick* repairObject = nullptr; // Cast<RepairObjectDemoByNick*>(repairObj);
@@ -332,7 +352,7 @@ void ABasePlayer::ClassSpecialty()
 void ABasePlayer::PopulateInventory()
 {
 	//GEngine->AddOnScreenDebugMessage(0, 3, FColor::Red, "Populate Inventory called & incomplete");
-	print("Populate Inventory called and incomplete");
+	//print("Populate Inventory called and incomplete");
 
 	if (bHasPopulatedInventory)
 	{
@@ -350,13 +370,13 @@ void ABasePlayer::PopulateInventory()
 		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.gunItemTemplate, spawnParams);
 
 		//Add it to inventory
-		AddToInventory(gun);
+		pInventoryComponent->GunItem = gun;
 		//pInventoryComponent->AddItem(gun);
 		//pInventoryComponent->pGunItem = gun;
 	}
 	else
 	{
-		print("No Gun Item");
+		//print("No Gun Item");
 	}
 
 
@@ -366,13 +386,13 @@ void ABasePlayer::PopulateInventory()
 		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.meleeItemTemplate, spawnParams);
 
 		//Add it to inventory
-		AddToInventory(melee);
+		pInventoryComponent->MeleeItem = melee;
 		//pInventoryComponent->AddItem(melee);
 		//pInventoryComponent->pMeleeItem = melee;
 	}
 	else
 	{
-		print("No Melee Item");
+		//print("No Melee Item");
 	}
 
 
@@ -382,13 +402,13 @@ void ABasePlayer::PopulateInventory()
 		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.classItemTemplate, spawnParams);
 
 		//Add it to inventory
-		AddToInventory(classItem);
+		pInventoryComponent->ClassItem = classItem;
 		//pInventoryComponent->AddItem(classItem);
 		//pInventoryComponent->pClassItem = classItem;
 	}
 	else
 	{
-		print("No class Item");
+		//	print("No class Item");
 	}
 
 
@@ -398,13 +418,13 @@ void ABasePlayer::PopulateInventory()
 		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.grenadeItemTemplate, spawnParams);
 
 		//Add it to inventory
-		AddToInventory(grenade);
+		pInventoryComponent->GrenadeItemClass = grenade;
 		//pInventoryComponent->AddItem(grenade);
 		//pInventoryComponent->pGrenadeItem = grenade;
 	}
 	else
 	{
-		print("No grenade Item");
+		//	print("No grenade Item");
 	}
 
 
@@ -419,32 +439,32 @@ void ABasePlayer::AddPlayerTags()
 	//Add the item tags in case I forgot to add them in code
 	switch (classInformation.playerClass)
 	{
-	case PlayerClass::Unknown : 
+	case PlayerClass::Unknown:
 		print("The tag being added was not set or Unknown");
 		break;
 
-	case PlayerClass::Engineer :
+	case PlayerClass::Engineer:
 		if (!ActorHasTag("Engineer"))
 		{
 			this->Tags.Add("Engineer");
 		}
 		break;
 
-	case PlayerClass::Medic :
+	case PlayerClass::Medic:
 		if (!ActorHasTag("Medic"))
 		{
 			this->Tags.Add("Medic");
 		}
 		break;
 
-	case PlayerClass::Gunner :
+	case PlayerClass::Gunner:
 		if (!ActorHasTag("Gunner"))
 		{
 			this->Tags.Add("Gunner");
 		}
 		break;
 
-	default :
+	default:
 		print("The tag being added was not set or Base");
 		break;
 	}

@@ -42,11 +42,10 @@ public:
 	UPROPERTY()
 		class URaycastComponent* pRaycastComponent = nullptr;
 
-
-
 	UPROPERTY()
 		class AWeapon* pActiveWeapon = nullptr; //A pointer to the active weapon
 
+	float weaponat = 0.0f;
 
 
 protected:
@@ -80,8 +79,8 @@ public:
 		void UseWeapon(); //A Function to use our pActiveItem
 
 	UFUNCTION()
-		void Interact();
 
+		void Interact();
 
 
 	UFUNCTION()
