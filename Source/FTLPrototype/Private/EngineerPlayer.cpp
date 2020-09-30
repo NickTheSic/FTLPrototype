@@ -2,6 +2,8 @@
 
 
 #include "EngineerPlayer.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
 
 AEngineerPlayer::AEngineerPlayer()
 {
@@ -14,13 +16,18 @@ AEngineerPlayer::AEngineerPlayer()
 
 void AEngineerPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 {
-	SetupPlayerInputComponent(PlayerInputComponent);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
 void AEngineerPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (pWeaponMesh)
+	{
+		pWeaponMesh->SetDebugDrawColor(FColor::Orange);
+	}
 }
 
 void AEngineerPlayer::ClassSpecialty()

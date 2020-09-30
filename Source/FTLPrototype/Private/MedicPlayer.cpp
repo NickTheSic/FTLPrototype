@@ -4,6 +4,8 @@
 #include "MedicPlayer.h"
 #include "Engine/Engine.h"
 #include "RaycastComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
 
 AMedicPlayer::AMedicPlayer()
 {
@@ -25,6 +27,11 @@ void AMedicPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputCompon
 void AMedicPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (pWeaponMesh)
+	{
+		pWeaponMesh->SetDebugDrawColor(FColor::Purple);
+	}
 
 }
 

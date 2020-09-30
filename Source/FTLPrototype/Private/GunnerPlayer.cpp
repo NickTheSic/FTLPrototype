@@ -3,6 +3,8 @@
 
 #include "GunnerPlayer.h"
 #include "Engine/Engine.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
 
 AGunnerPlayer::AGunnerPlayer()
 {
@@ -23,6 +25,11 @@ void AGunnerPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputCompo
 void AGunnerPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (pWeaponMesh)
+	{
+		pWeaponMesh->SetDebugDrawColor(FColor::Green);
+	}
 
 }
 
