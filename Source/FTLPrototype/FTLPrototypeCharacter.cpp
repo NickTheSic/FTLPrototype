@@ -13,7 +13,9 @@
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "DrawDebugHelpers.h"
 #include "Public/EventObject.h"
-
+#include "JustinFolder/FTLPrototypeHealthComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/Actor.h"
 
 #include "RaycastComponent.h"
 
@@ -87,6 +89,10 @@ AFTLPrototypeCharacter::AFTLPrototypeCharacter()
 
 	pRaycastComponent = CreateDefaultSubobject<URaycastComponent>(TEXT("RaycastComponent"));
 
+	HealthComp = CreateDefaultSubobject<UFTLPrototypeHealthComponent>(TEXT("HealthComp"));
+
+	bDied = false;
+
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
 }
@@ -110,6 +116,8 @@ void AFTLPrototypeCharacter::BeginPlay()
 		VR_Gun->SetHiddenInGame(true, true);
 		Mesh1P->SetHiddenInGame(false, true);
 	}
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &AFTLPrototypeCharacter::OnHealthChanged);
 }
 
 void AFTLPrototypeCharacter::OnInteract()
@@ -181,6 +189,9 @@ void AFTLPrototypeCharacter::OnFire()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
+			MakeNoise(3200.0f, this, GetActorLocation(), 3200.0f);
+		
+
 			if (bUsingMotionControllers)
 			{
 				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
@@ -196,6 +207,7 @@ void AFTLPrototypeCharacter::OnFire()
 				//Set Spawn Collision Handling Override
 				FActorSpawnParameters ActorSpawnParams;
 				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+				ActorSpawnParams.Owner = this;
 
 				// spawn the projectile at the muzzle
 				World->SpawnActor<AFTLPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
@@ -332,4 +344,20 @@ bool AFTLPrototypeCharacter::EnableTouchscreenMovement(class UInputComponent* Pl
 	}
 	
 	return false;
+}
+
+void AFTLPrototypeCharacter::OnHealthChanged(UFTLPrototypeHealthComponent* InHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "Player's Health: " + FString::SanitizeFloat(Health));
+	if (Health <= 0 && !bDied)
+	{
+		bDied = true;
+
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetVisibility(false);
+
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.0f);
+	}
 }
