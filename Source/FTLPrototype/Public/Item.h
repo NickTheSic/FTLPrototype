@@ -26,7 +26,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HitBox", meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* pHitBox;
 
-public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
