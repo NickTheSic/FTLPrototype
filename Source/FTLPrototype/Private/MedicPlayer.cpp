@@ -53,10 +53,18 @@ void AMedicPlayer::ClassSpecialty()
 				if (otherPlayer != nullptr)
 				{
 					HealOther(otherPlayer);
+
+					return;
 				}
+
+				//ELSE
+				//We can refill the Medics Syringe to heal people
+				//If we use the syring at the healing station in the medbay
+
 			}
 		}
 	}
+	
 
 }
 

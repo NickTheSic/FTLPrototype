@@ -32,7 +32,6 @@ public:
 		class USkeletalMeshComponent* pWeaponMesh = nullptr;
 
 
-
 	UPROPERTY()
 		class UUInventory* pInventoryComponent = nullptr; //A nullptr to the Inventory, created later
 

@@ -465,12 +465,10 @@ void ABasePlayer::AddPlayerTags()
 }
 
 
-#define pActiveWeaponGetMesh nullptr; 
 void ABasePlayer::SetWeaponMesh()
 {
-	pWeaponMesh = pActiveWeaponGetMesh;
+	//pWeaponMesh = pActiveWeapon->GetMesh();
 }
-#undef pActiveWeaponGetMesh
 
 
 #undef print
