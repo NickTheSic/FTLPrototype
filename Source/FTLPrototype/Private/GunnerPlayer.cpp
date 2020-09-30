@@ -2,6 +2,9 @@
 
 
 #include "GunnerPlayer.h"
+#include "Engine/Engine.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
 
 AGunnerPlayer::AGunnerPlayer()
 {
@@ -12,8 +15,28 @@ AGunnerPlayer::AGunnerPlayer()
 
 }
 
+void AGunnerPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
+{
+	SetupPlayerInputComponent(PlayerInputComponent);
+
+
+}
+
 void AGunnerPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (pWeaponMesh)
+	{
+		pWeaponMesh->SetDebugDrawColor(FColor::Green);
+	}
+
+}
+
+void AGunnerPlayer::ClassSpecialty()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, "Gunner Class Special");
+
+
 
 }

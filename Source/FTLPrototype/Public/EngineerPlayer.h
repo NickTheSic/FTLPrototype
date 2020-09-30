@@ -17,8 +17,13 @@ class FTLPROTOTYPE_API AEngineerPlayer : public ABasePlayer
 public:
 	AEngineerPlayer();
 
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void ClassSpecialty() override;
 
 };

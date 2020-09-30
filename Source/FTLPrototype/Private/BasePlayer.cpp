@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
+#include "EventObject.h"
 #include "HealthComponent.h"
 #include "RaycastComponent.h"
 #include "UInventory.h"
@@ -61,6 +62,49 @@ ABasePlayer::ABasePlayer()
 
 }
 
+
+// Called when the game starts or when spawned
+void ABasePlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//They are binding the Gun here in the Prototype
+	pWeaponMesh->AttachToComponent(pMeshComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+
+	//A Function to add the tag automatically in case I forget
+	AddPlayerTags();
+
+
+	//Populate the inventory everytime BeginPlay gets called
+	bHasPopulatedInventory = false;
+	PopulateInventory();
+}
+
+
+// Called every frame
+void ABasePlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+
+
+}
+
+
+void ABasePlayer::ClassSpecialty()
+{
+	print("This is the Base Class function which is incomplete");
+}
+
+
+void ABasePlayer::ReplenishHealth()
+{
+	//HealthComponent Regain Health
+	//Base on the players Regen Speed
+
+	//pHealthComponent->Heal();
+}
+
 // Called to bind functionality to input
 void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -73,10 +117,11 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	//Our main action event
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABasePlayer::UseWeapon);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ABasePlayer::StopUsingWeapon);
 
 	//Interaction
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABasePlayer::Interact);
-
+	PlayerInputComponent->BindAction("ClassSpecialty", IE_Pressed, this, &ABasePlayer::ClassSpecialty);
 
 	//Movement
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABasePlayer::MoveForward);
@@ -89,43 +134,66 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 
 	//Switching weapon functions
-	 //Should be changed to a BindAction or else it repeats
-	PlayerInputComponent->BindAxis("WeaponSelectNum", this, &ABasePlayer::SwitchToInventorySlot);
+	//Individual Number presses
+	PlayerInputComponent->BindAction("WeaponSelectNum1", IE_Pressed, this, &ABasePlayer::SwitchToItemOne);
+	PlayerInputComponent->BindAction("WeaponSelectNum2", IE_Pressed, this, &ABasePlayer::SwitchToItemTwo);
+	PlayerInputComponent->BindAction("WeaponSelectNum3", IE_Pressed, this, &ABasePlayer::SwitchToItemThree);
+	PlayerInputComponent->BindAction("WeaponSelectNum4", IE_Pressed, this, &ABasePlayer::SwitchToItemFour);
+
 	//This isn't working as I thought it would work
-	PlayerInputComponent->BindAxis("WeaponSelectMouseWheel", this, &ABasePlayer::SwitchInventoryWithMouseWheel);
+	PlayerInputComponent->BindAction("WeaponSelectMouseWheelUp",   IE_Pressed, this, &ABasePlayer::SwitchInventoryMouseWheelUp  );
+	PlayerInputComponent->BindAction("WeaponSelectMouseWheelDown", IE_Pressed, this, &ABasePlayer::SwitchInventoryMouseWheelDown);
 
 }
 
 
-#define Use() ;// ->Use;
 void ABasePlayer::UseWeapon()
 {
 	if (pActiveWeapon != nullptr)
 	{
 		//Use the weapon
-		pActiveWeapon Use()
+		pActiveWeapon->Use();
+	}
+	else
+	{
+		print("Active weapon was null while trying to use");
 	}
 }
-#undef Use
 
-
-#define pActiveWeaponGetMesh nullptr; 
-void ABasePlayer::SetWeaponMesh()
+void ABasePlayer::StopUsingWeapon()
 {
-	pWeaponMesh = pActiveWeaponGetMesh;
+	//pActiveWeapon->StopFire();
 }
-#undef pActiveWeaponGetMesh
 
 
-#define InventoryGetItem(item) nullptr; print( "item selected");
-//Switches to the specific slot in the inventory that was pressed
-void ABasePlayer::SwitchToInventorySlot(float item)
+void ABasePlayer::SwitchToItemOne()
 {
-	if (item == 0.0f) return;
+	print("Switch to item with 1");
+	SwitchToInventorySlot(1);
+}
 
-	//Cast the item number to an int for the switch statement
-	int val = static_cast<int>(item);
+void ABasePlayer::SwitchToItemTwo()
+{
+	print("Switch to item with 2");
+	SwitchToInventorySlot(2);
+}
 
+void ABasePlayer::SwitchToItemThree()
+{
+	print("Switch to item with 3");
+	SwitchToInventorySlot(3);
+}
+
+void ABasePlayer::SwitchToItemFour()
+{
+	print("Switch to item with 4");
+	SwitchToInventorySlot(4);
+}
+
+#define InventoryGetItem(item) nullptr; // Cast<AWeapon>(pInventoryComponent->GetItem(item));
+//Switches to the specific slot in the inventory that was pressed
+void ABasePlayer::SwitchToInventorySlot(int val)
+{
 	switch (val)
 	{
 	case 1:
@@ -157,16 +225,6 @@ void ABasePlayer::SwitchToInventorySlot(float item)
 
 }
 
-void ABasePlayer::SwitchInventoryWithMouseWheel(float val)
-{
-	if (val == 0.0f) return;
-
-	if (val < 0.0f) SwitchInventoryMouseWheelDown();
-	else		 SwitchInventoryMouseWheelUp();
-
-	SetWeaponMesh();
-
-}
 
 void ABasePlayer::SwitchInventoryMouseWheelUp()
 {
@@ -203,53 +261,26 @@ void ABasePlayer::Interact()
 {
 	FHitResult ray;
 
-	print("Interacting");
+	print("Interact function entered");
 
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
 	{
-
 		//Draw a Debug line while in the editor only
-#if WITH_EDITOR
+		#if WITH_EDITOR
 		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Cyan);
-#endif
+		#endif
 
 		AActor* hitObj = ray.GetActor();
 		if (hitObj != nullptr)
 		{
-			if (hitObj->Tags.Contains("System"))
+			if (hitObj->Tags.Contains("SystemEvent"))
 			{
 				//We hit a repairable object if Robert has named this the same
 				Repair(hitObj);
 			}
 		}
-
-
 	}
 }
-
-// Called when the game starts or when spawned
-void ABasePlayer::BeginPlay()
-{
-	Super::BeginPlay();
-
-	//A Function to add the tag automatically in case I forget
-	AddPlayerTags();
-
-
-	//Populate the inventory everytime BeginPlay gets called
-	bHasPopulatedInventory = false;
-	PopulateInventory();
-
-}
-
-
-//A DEMO CLASS THAT WILL BE REMOVED BEFORE MONDAY
-class RepairObjectDemoByNick
-{
-public:
-	int GetType() { return rand() % 3; }
-	void Repair(float f) { }
-};
 
 void ABasePlayer::Repair()
 {
@@ -270,7 +301,7 @@ void ABasePlayer::Repair()
 		AActor* hitObj = ray.GetActor();
 		if (hitObj != nullptr)
 		{
-			if (hitObj->Tags.Contains("System"))
+			if (hitObj->Tags.Contains("SystemEvent"))
 			{
 				//We hit a repairable object if Robert has named this the same
 				Repair(hitObj);
@@ -281,40 +312,21 @@ void ABasePlayer::Repair()
 
 void ABasePlayer::Repair(AActor* repairObj)
 {
+	AEventObject* repairObject =  Cast<AEventObject>(repairObj);
 
-	RepairObjectDemoByNick* repairObject = nullptr; // Cast<RepairObjectDemoByNick*>(repairObj);
-	if (repairObject == nullptr) return;
-
-	switch (repairObject->GetType())
+	if (repairObject == nullptr)
 	{
-	case 0:
-		print("Engineer Repair");
-		repairObject->Repair(classInformation.fEngineeringRepairSpeed);
-		break;
+		print("Repiar object was null");
+		return;
+	}
 
-	case 1:
-		print("Medic Repair?");
-		repairObject->Repair(classInformation.fMedicRepairSpeed);
-		break;
-
-	case 2:
-		print("Common Repair?");
-		repairObject->Repair(classInformation.fCommonRepairSpeed);
-		break;
-
-	default:
-		print("Deafult Repair?");
-		repairObject->Repair(classInformation.fDefaultRepairSpeed);
-		break;
+	if (repairObject->IsActive())
+	{
+		print("Repairing the object");
+		repairObject->Deactivate();
 	}
 }
 
-// Called every frame
-void ABasePlayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
 void ABasePlayer::OnInteract()
 {
@@ -339,15 +351,9 @@ void ABasePlayer::MoveForward(float val)
 }
 
 
-void ABasePlayer::ClassSpecialty()
-{
-	print("This is the Base Class function which is incomplete");
-}
-
-
 //I am not sure how the inventory is going to work
 //Putting this here to quickly and easily change it all at once
-#define AddToInventory(item); ;
+#define AddToInventory(item); pInventoryComponent->AddItemToInventory(item);
 
 void ABasePlayer::PopulateInventory()
 {
@@ -364,10 +370,10 @@ void ABasePlayer::PopulateInventory()
 	FActorSpawnParameters spawnParams;	//Just basic spawnParams
 
 
-	if (classInformation.gunItemTemplate != nullptr)
+	if (classInformation.weaponInformation.gunItemTemplate != nullptr)
 	{
 		//Create the GunItem
-		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.gunItemTemplate, spawnParams);
+		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.weaponInformation.gunItemTemplate, spawnParams);
 
 		//Add it to inventory
 		pInventoryComponent->GunItem = gun;
@@ -380,10 +386,10 @@ void ABasePlayer::PopulateInventory()
 	}
 
 
-	if (classInformation.meleeItemTemplate != nullptr)
+	if (classInformation.weaponInformation.meleeItemTemplate != nullptr)
 	{
 		//Create the Melee item
-		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.meleeItemTemplate, spawnParams);
+		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.weaponInformation.meleeItemTemplate, spawnParams);
 
 		//Add it to inventory
 		pInventoryComponent->MeleeItem = melee;
@@ -396,10 +402,10 @@ void ABasePlayer::PopulateInventory()
 	}
 
 
-	if (classInformation.classItemTemplate != nullptr)
+	if (classInformation.weaponInformation.classItemTemplate != nullptr)
 	{
 		//Create the Class item
-		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.classItemTemplate, spawnParams);
+		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.weaponInformation.classItemTemplate, spawnParams);
 
 		//Add it to inventory
 		pInventoryComponent->ClassItem = classItem;
@@ -412,10 +418,10 @@ void ABasePlayer::PopulateInventory()
 	}
 
 
-	if (classInformation.grenadeItemTemplate != nullptr)
+	if (classInformation.weaponInformation.grenadeItemTemplate != nullptr)
 	{
 		//Create the Class item
-		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.grenadeItemTemplate, spawnParams);
+		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.weaponInformation.grenadeItemTemplate, spawnParams);
 
 		//Add it to inventory
 		pInventoryComponent->GrenadeItemClass = grenade;
@@ -468,6 +474,12 @@ void ABasePlayer::AddPlayerTags()
 		print("The tag being added was not set or Base");
 		break;
 	}
+}
+
+
+void ABasePlayer::SetWeaponMesh()
+{
+	//pWeaponMesh = pActiveWeapon->GetMesh();
 }
 
 
