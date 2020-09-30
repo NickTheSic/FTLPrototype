@@ -31,10 +31,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Collider)
 		class UBoxComponent* pBoxCollider;
 
-	//How a player will interact with the Event
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactable)
-		class UInteractableBox* pInteractableBox;
-
 	//The material that will be when active
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Material)
 		class UMaterial* pActiveMaterial;
@@ -45,10 +41,50 @@ public:
 
 	//When activated can be interacted with
 	bool bisActive;
+	bool IsActive() { return bisActive; }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//Set of bools to determine type of event, how fast they occur when active and by how much, which will be set in blueprints per event
+	//Values must be set in blueprints as code will set them to 0
+
+	//Health Event
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		bool bHealthEvent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		float fHealthEventSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		float fHealthEventValue;
+	
+	//Oxygen Event
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		bool bOxygenEvent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		float fOxygenEventSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		float fOxygenEventValue;
+
+	//Spawn Event
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		bool bSpawnEvent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		float fSpawnEventSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		float fSpawnEventValue;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//Timer for when it will randomly activate
 	FTimerHandle ActivationTimer;
 
+	//Timer to decrement health
+	FTimerHandle HealthDecrementTimer;
+
+	//Timer to decrement oxygen
+	FTimerHandle OxygenDecrementTimer;
+
+	//Timer to spawn the AI
+	FTimerHandle SpawnTimer;
 
 	//Called when Timer is done
 	UFUNCTION()
@@ -58,7 +94,15 @@ public:
 	UFUNCTION()
 		void Deactivate();
 
-	//A bool call to check if the object is active or not
+	//Is called on HealthEvent objects to lower health
 	UFUNCTION()
-		bool IsActive();
+		void LowerHealth();
+
+	//Is called on OxygenEvent objects to lower the oxygen count
+	UFUNCTION()
+		void LowerOxygen();
+
+	//Is called on SpawnEvent objects to spawn AI
+	UFUNCTION()
+		void SpawnEnemy();
 };
