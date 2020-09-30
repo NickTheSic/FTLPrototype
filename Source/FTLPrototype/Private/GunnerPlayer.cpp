@@ -2,6 +2,7 @@
 
 
 #include "GunnerPlayer.h"
+#include "Engine/Engine.h"
 
 AGunnerPlayer::AGunnerPlayer()
 {
@@ -12,8 +13,23 @@ AGunnerPlayer::AGunnerPlayer()
 
 }
 
+void AGunnerPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
+{
+	SetupPlayerInputComponent(PlayerInputComponent);
+
+
+}
+
 void AGunnerPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+}
+
+void AGunnerPlayer::ClassSpecialty()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, "Gunner Class Special");
+
+
 
 }

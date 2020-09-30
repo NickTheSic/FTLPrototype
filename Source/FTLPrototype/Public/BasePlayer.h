@@ -72,12 +72,17 @@ public:
 		FPlayerInteractSignature onPlayerInteract;
 
 
+	void ReplenishHealth();
+
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
 	UFUNCTION()
-		void UseWeapon(); //A Function to use our pActiveItem
+		void UseWeapon(); //A Function to use our pActiveItem // StartFire();
+	UFUNCTION()
+		void StopUsingWeapon(); //StopFire()
 
 	UFUNCTION()
 		void Interact();
@@ -106,6 +111,7 @@ public:
 		void MoveRight(float val);
 	UFUNCTION()
 		void MoveForward(float val);
+
 
 private:
 

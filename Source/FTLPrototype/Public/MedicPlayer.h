@@ -16,7 +16,16 @@ class FTLPROTOTYPE_API AMedicPlayer : public ABasePlayer
 public:
 	AMedicPlayer();
 
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void ClassSpecialty() override;
+
+	bool bHealingSelf = true; //Default to healing ourself I guess
+
+	void HealSelf();
+	void HealOther(ABasePlayer* other);
+	
 };

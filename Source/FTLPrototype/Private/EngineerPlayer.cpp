@@ -12,7 +12,19 @@ AEngineerPlayer::AEngineerPlayer()
 
 }
 
+void AEngineerPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
+{
+	SetupPlayerInputComponent(PlayerInputComponent);
+
+}
+
 void AEngineerPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AEngineerPlayer::ClassSpecialty()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, "Engineer Class Special");
+
 }

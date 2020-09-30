@@ -86,6 +86,8 @@ void ABasePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+
 }
 
 
@@ -94,6 +96,14 @@ void ABasePlayer::ClassSpecialty()
 	print("This is the Base Class function which is incomplete");
 }
 
+
+void ABasePlayer::ReplenishHealth()
+{
+	//HealthComponent Regain Health
+	//Base on the players Regen Speed
+
+	//pHealthComponent->Heal();
+}
 
 // Called to bind functionality to input
 void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -107,10 +117,11 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	//Our main action event
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABasePlayer::UseWeapon);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ABasePlayer::StopUsingWeapon);
 
 	//Interaction
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABasePlayer::Interact);
-
+	PlayerInputComponent->BindAction("ClassSpecialty", IE_Pressed, this, &ABasePlayer::ClassSpecialty);
 
 	//Movement
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABasePlayer::MoveForward);
@@ -147,6 +158,11 @@ void ABasePlayer::UseWeapon()
 	{
 		print("Active weapon was null while trying to use");
 	}
+}
+
+void ABasePlayer::StopUsingWeapon()
+{
+	//pActiveWeapon->StopFire();
 }
 
 
