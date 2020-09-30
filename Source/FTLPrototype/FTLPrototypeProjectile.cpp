@@ -3,6 +3,8 @@
 #include "FTLPrototypeProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "JustinFolder/FTLPrototypeHealthComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AFTLPrototypeProjectile::AFTLPrototypeProjectile() 
 {
@@ -27,12 +29,15 @@ AFTLPrototypeProjectile::AFTLPrototypeProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
+	BaseDamage = 20.f;
+
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 }
 
 void AFTLPrototypeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
@@ -40,4 +45,35 @@ void AFTLPrototypeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 
 		Destroy();
 	}
+
+	AActor* Owner2 = GetOwner();
+
+	if (Owner2)
+	{
+		UFTLPrototypeHealthComponent* Target = Cast<UFTLPrototypeHealthComponent>(OtherActor->GetComponentByClass(UFTLPrototypeHealthComponent::StaticClass())); //if actor has a health component
+		if ((OtherActor != NULL) && (OtherActor != this) && OtherActor->ActorHasTag("BadGuys"))
+		{
+			//UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, nullptr, GetOwner(), DamageType);
+			UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, Owner2->GetInstigatorController(), Owner2, DamageType);
+
+			Destroy();
+		}
+	}
+	
+
+
+
+	//AActor* MyOwner = GetOwner();
+	////AController* MyController = Cast<AController>(MyOwner->GetInstigatorController());
+	////if (MyOwner)
+	//{
+	//	UFTLPrototypeHealthComponent* Target = Cast<UFTLPrototypeHealthComponent>(OtherActor->GetComponentByClass(UFTLPrototypeHealthComponent::StaticClass())); //if actor has a health component
+	//	if (Target && Target->GetHealth() > 0.0f && OtherActor != this)
+	//	{
+	//		UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, MyOwner->GetInstigatorController(), MyOwner, DamageType);
+
+	//		Destroy();
+	//	}
+	//}
+
 }

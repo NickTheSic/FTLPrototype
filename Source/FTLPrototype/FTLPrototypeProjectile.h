@@ -6,10 +6,15 @@
 #include "GameFramework/Actor.h"
 #include "FTLPrototypeProjectile.generated.h"
 
+class UDamageType;
+
+
 UCLASS(config=Game)
 class AFTLPrototypeProjectile : public AActor
 {
 	GENERATED_BODY()
+
+protected:
 
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
@@ -18,6 +23,12 @@ class AFTLPrototypeProjectile : public AActor
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Projectile)
+	float BaseDamage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TSubclassOf<UDamageType> DamageType;
 
 public:
 	AFTLPrototypeProjectile();

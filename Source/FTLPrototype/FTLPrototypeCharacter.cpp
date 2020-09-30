@@ -15,7 +15,9 @@
 #include "Public/EventObject.h"
 #include "Weapon.h"
 #include "UInventory.h"
-
+#include "JustinFolder/FTLPrototypeHealthComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/Actor.h"
 
 #include "RaycastComponent.h"
 
@@ -89,6 +91,10 @@ AFTLPrototypeCharacter::AFTLPrototypeCharacter()
 
 	pRaycastComponent = CreateDefaultSubobject<URaycastComponent>(TEXT("RaycastComponent"));
 
+	HealthComp = CreateDefaultSubobject<UFTLPrototypeHealthComponent>(TEXT("HealthComp"));
+
+	bDied = false;
+
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
 
@@ -118,6 +124,10 @@ void AFTLPrototypeCharacter::BeginPlay()
 	}
 
 	PopulateInventory();
+	
+	HealthComp->OnHealthChanged.AddDynamic(this, &AFTLPrototypeCharacter::OnHealthChanged);
+
+
 }
 
 void AFTLPrototypeCharacter::OnInteract()
@@ -271,6 +281,7 @@ void AFTLPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 void AFTLPrototypeCharacter::OnFire()
 {
 	// try and fire a projectile
+
 	//if (ProjectileClass != NULL)
 	//{
 	//	UWorld* const World = GetWorld();
@@ -299,7 +310,6 @@ void AFTLPrototypeCharacter::OnFire()
 	//}
 
 	//Call FireStart() on current weapon
-
 	// try and play the sound if specified
 	if (FireSound != NULL)
 	{
@@ -436,6 +446,7 @@ bool AFTLPrototypeCharacter::EnableTouchscreenMovement(class UInputComponent* Pl
 	return false;
 }
 
+
 void AFTLPrototypeCharacter::SetWeaponMesh()
 {
 	FP_Gun.me = pActiveWeapon->GetMesh();
@@ -488,4 +499,20 @@ void AFTLPrototypeCharacter::SwitchInventoryMouseWheelUp()
 
 void AFTLPrototypeCharacter::SwitchInventoryMouseWheelDown()
 {
+	
+void AFTLPrototypeCharacter::OnHealthChanged(UFTLPrototypeHealthComponent* InHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "Player's Health: " + FString::SanitizeFloat(Health));
+	if (Health <= 0 && !bDied)
+	{
+		bDied = true;
+
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetVisibility(false);
+
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.0f);
+	}
+	
 }

@@ -8,6 +8,7 @@
 #include "FTLPrototypeCharacter.generated.h"
 
 class UInputComponent;
+class UFTLPrototypeHealthComponent;
 
 UCLASS(config=Game)
 class AFTLPrototypeCharacter : public ACharacter
@@ -171,6 +172,18 @@ public:
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+protected:
+
+	// JUSTINS HEALTHCOMPONENT CODE!!!!!!!!!!!!!!!!!!
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+	UFTLPrototypeHealthComponent* HealthComp;
+
+	UFUNCTION() //delegate
+	void OnHealthChanged(UFTLPrototypeHealthComponent* InHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	bool bDied;
 
 };
 
