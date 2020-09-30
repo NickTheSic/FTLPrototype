@@ -87,6 +87,9 @@ protected:
 	/** Fires a projectile. */
 	void OnFire();
 
+	/** Reloads current weapon. */
+	void Reload();
+
 	/** Resets HMD orientation and position in VR. */
 	void OnResetVR();
 

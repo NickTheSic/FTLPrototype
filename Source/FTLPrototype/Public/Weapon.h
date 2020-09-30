@@ -17,8 +17,12 @@ class FTLPROTOTYPE_API AWeapon : public AItem
 public:
 	//sets defaults
 	AWeapon();
+	virtual void Tick(float deltaTime) override;
 
 protected:
+
+	virtual void BeginPlay() override;
+
 	//Can be edited anywhere, reads/writes from blueprint, under weapon stats, allows private variables to be accessed
 	UPROPERTY(EditAnywhere, Category = "Weapon Stats", meta = (AllowPrivateAccess = "true"))
 		bool bIsFiring;				//if the weapon is firing/attacking

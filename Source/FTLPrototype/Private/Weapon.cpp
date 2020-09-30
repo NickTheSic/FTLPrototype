@@ -12,6 +12,18 @@ AWeapon::AWeapon()
     iReserveAmmo = 0;
     uiMaxReserveAmmo = 0;
     fReloadTime = 0.0f;
+
+    PrimaryActorTick.bCanEverTick = false;
+}
+
+void AWeapon::BeginPlay()
+{
+    Super::BeginPlay();
+}
+
+void AWeapon::Tick(float deltaTime)
+{
+    Super::Tick(deltaTime);
 }
 
 void AWeapon::FireStart()

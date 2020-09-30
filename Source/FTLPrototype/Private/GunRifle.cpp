@@ -17,16 +17,18 @@ AGunRifle::AGunRifle()
     fFireRate = 12.0f;
 
     pRayCast = CreateDefaultSubobject<URaycastComponent>("RayCast");
+
+    PrimaryActorTick.bCanEverTick = false;
 }
 
 void AGunRifle::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
-    if (btest == false)
-    {
-        btest = true;
-        FireStart();
-    }
+}
+
+void AGunRifle::BeginPlay()
+{
+    Super::BeginPlay();
 }
 
 //Called when player PRESSES left click
@@ -65,6 +67,7 @@ void AGunRifle::Fire()
         }
         else
         {
+            //rTodo: deal damage
             //if the actor we hit is an enemy, take damage
             //AEnemyBase* enemy = Cast<AEnemyBase>(hit.GetActor());
             //if (enemy != nullptr)
@@ -83,7 +86,7 @@ void AGunRifle::Fire()
     {
         //play a click sound
         
-        //TODO: remove this, it's a temporary fix for ammo testing
+        //rTODO: remove this, it's a temporary fix for ammo testing
         //FireEnd();
         //ReloadStart();
     }
@@ -138,7 +141,7 @@ void AGunRifle::Reload()
 void AGunRifle::ReloadEnd()
 {
     //End of reload if we need to do anything here
-    //TODO: remove this, it's a temporary fix for ammo testing
+    //rTODO: remove this, it's a temporary fix for ammo testing
     //GEngine->AddOnScreenDebugMessage(4, 2.0f, FColor::Red, "End of reload");
     //FireStart();
 }
