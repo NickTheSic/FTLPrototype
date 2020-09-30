@@ -23,11 +23,9 @@ AEventObject::AEventObject()
 	pStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	pStaticMesh->SetupAttachment(RootComponent);
 
+	//Material meshs for on/off states
 	pActiveMaterial = CreateDefaultSubobject<UMaterial>("ActiveMaterial");
 	pDeactiveMaterial = CreateDefaultSubobject<UMaterial>("DeactiveMaterial");
-
-	pInteractableBox = CreateDefaultSubobject<UInteractableBox>("Collider");
-	pInteractableBox->SetupAttachment(RootComponent);
 
 	Tags.Add("SystemEvent");
 
@@ -39,6 +37,7 @@ void AEventObject::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Works as a basic Init function and sets up the event to not be active
 	Deactivate();
 
 }
@@ -53,20 +52,56 @@ void AEventObject::Tick(float DeltaTime)
 
 void AEventObject::Activate()
 {
+	//Changes the Mesh and sets the bool to true
 	bisActive = true;
 	pStaticMesh->SetMaterial(0, pActiveMaterial);
+
+	//All events can activate any ammount of timers below and will only be call by variables already set in blueprints.
+	if (bHealthEvent)
+	{
+		GetWorld()->GetTimerManager().SetTimer(HealthDecrementTimer, this, &AEventObject::LowerHealth, fHealthEventSpeed, true);
+	}
+
+	if (bOxygenEvent)
+	{
+		GetWorld()->GetTimerManager().SetTimer(OxygenDecrementTimer, this, &AEventObject::LowerOxygen, fOxygenEventSpeed, true);
+	}
+
+	if (bSpawnEvent)
+	{
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &AEventObject::SpawnEnemy, fSpawnEventSpeed, true);
+	}
+
 }
 
 void AEventObject::Deactivate()
 {
+	//Disables everything and sets the mesh back to a fixed state
 	bisActive = false;
 	pStaticMesh->SetMaterial(0, pDeactiveMaterial);
-	float fRandomActivation = FMath::RandRange(3.0f, 6.0f);
+
+	//Clearing all timers so they dont activate again
+	GetWorld()->GetTimerManager().ClearTimer(HealthDecrementTimer);
+	GetWorld()->GetTimerManager().ClearTimer(OxygenDecrementTimer);
+	GetWorld()->GetTimerManager().ClearTimer(SpawnTimer);
+
+	//Temporary for prototype, will randomly activate from a set value
+	float fRandomActivation = FMath::RandRange(5.0f, 20.0f);
 	GetWorld()->GetTimerManager().SetTimer(ActivationTimer, this, &AEventObject::Activate, fRandomActivation, false);
 }
 
-bool AEventObject::IsActive()
+void AEventObject::LowerHealth()
 {
-	return bisActive;
+
+}
+
+void AEventObject::LowerOxygen()
+{
+
+}
+
+void AEventObject::SpawnEnemy()
+{
+
 }
 
