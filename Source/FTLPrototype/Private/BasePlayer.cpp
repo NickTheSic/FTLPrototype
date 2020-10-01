@@ -8,7 +8,13 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "EventObject.h"
-#include "HealthComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/GameModeBase.h"
+#include "../JustinFolder/FTLPrototypeHealthComponent.h"
+#include "Kismet/Gameplaystatics.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Hearing.h"
+#include "Perception/AISense_Sight.h"
 #include "RaycastComponent.h"
 #include "UInventory.h"
 #include "Weapon.h"
@@ -25,6 +31,7 @@ ABasePlayer::ABasePlayer()
 
 	//Setup Collider
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+	GetCapsuleComponent()->SetCollisionProfileName("BlockAll");
 
 	//Setup Camera
 	pCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -49,8 +56,15 @@ ABasePlayer::ABasePlayer()
 	pWeaponMesh->SetupAttachment(RootComponent);
 
 
+	//Setup AI PErception
+	pAIPerception = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AI Perception"));
+	pAIPerception->bAutoRegister = true;
+	pAIPerception->RegisterForSense(UAISense_Hearing::StaticClass());
+	pAIPerception->RegisterForSense(UAISense_Sight::StaticClass());
+
+
 	//Setup the Health Component
-	pHealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
+	pHealthComponent = CreateDefaultSubobject<UFTLPrototypeHealthComponent>("Health Component");
 
 
 	//Setup the Inventory Component
@@ -78,6 +92,15 @@ void ABasePlayer::BeginPlay()
 	//Populate the inventory everytime BeginPlay gets called
 	bHasPopulatedInventory = false;
 	PopulateInventory();
+
+
+	SwitchToItemOne(); //Automatically Start with the Gun
+
+	//Bind health component
+	//if (pHealthComponent)
+	pHealthComponent->OnHealthChanged.AddDynamic(this, &ABasePlayer::OnHealthChanged);
+
+
 }
 
 
@@ -86,8 +109,38 @@ void ABasePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (pHealthComponent && pHealthComponent->bIsDead)
+	//{
+	//	print("Player is dead and I haven't gotten around to finishing this since the ")
+	//	UGameplayStatics::GetGameMode(this);
+	//}
 
+}
 
+AWeapon * ABasePlayer::GetCurrentWeapon()
+{
+	return pActiveWeapon;
+}
+
+URaycastComponent * ABasePlayer::GetRaycastComponent()
+{
+	return pRaycastComponent;
+}
+
+void ABasePlayer::OnHealthChanged(UFTLPrototypeHealthComponent * InHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "Player's Health: " + FString::SanitizeFloat(Health));
+	if (Health <= 0 && !bDied)
+	{
+		bDied = true;
+
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetVisibility(false);
+
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.0f);
+	}
 }
 
 
@@ -102,7 +155,9 @@ void ABasePlayer::ReplenishHealth()
 	//HealthComponent Regain Health
 	//Base on the players Regen Speed
 
-	//pHealthComponent->Heal();
+	print("Replenishing Health for the plauer charater");
+
+	pHealthComponent->Heal( classInformation.fHealspeed );
 }
 
 // Called to bind functionality to input
@@ -118,6 +173,8 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABasePlayer::UseWeapon);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ABasePlayer::StopUsingWeapon);
+
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ABasePlayer::Reload);
 
 	//Interaction
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ABasePlayer::Interact);
@@ -149,20 +206,50 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void ABasePlayer::UseWeapon()
 {
+
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+	
+	// try and play a firing animation if specified
+	if (FireAnimation != NULL)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = pMeshComponent->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+
 	if (pActiveWeapon != nullptr)
 	{
 		//Use the weapon
-		pActiveWeapon->Use();
+		pActiveWeapon->FireStart();
+		MakeNoise(1000.0f);
 	}
 	else
 	{
 		print("Active weapon was null while trying to use");
 	}
+
 }
 
 void ABasePlayer::StopUsingWeapon()
 {
-	//pActiveWeapon->StopFire();
+	if (pActiveWeapon)
+	{
+		pActiveWeapon->FireEnd();
+	}
+}
+
+void ABasePlayer::Reload()
+{
+	if (pActiveWeapon)
+	{
+		pActiveWeapon->ReloadStart();
+	}
 }
 
 
@@ -190,29 +277,31 @@ void ABasePlayer::SwitchToItemFour()
 	SwitchToInventorySlot(4);
 }
 
-#define InventoryGetItem(item) nullptr; // Cast<AWeapon>(pInventoryComponent->GetItem(item));
-//Switches to the specific slot in the inventory that was pressed
 void ABasePlayer::SwitchToInventorySlot(int val)
 {
 	switch (val)
 	{
 	case 1:
 		//Select the Gun
+		print("Gun Selected");
 		pActiveWeapon = pInventoryComponent->GunItem;
 		weaponat = val;
 		break;
 	case 2:
 		//Select melee
+		print("Melee Selected");
 		pActiveWeapon = pInventoryComponent->MeleeItem;
 		weaponat = val;
 		break;
 	case 3:
 		//Select class item
+		print("Class Item Selected")
 		pActiveWeapon = pInventoryComponent->ClassItem;
 		weaponat = val;
 		break;
 	case 4:
 		//Select Grenade
+		print("Grenade Selected")
 		pActiveWeapon = pInventoryComponent->GrenadeItemClass;
 		weaponat = val;
 		break;
@@ -238,7 +327,8 @@ void ABasePlayer::SwitchInventoryMouseWheelUp()
 	{
 		weaponat = 1;
 	}
-		SwitchToInventorySlot(weaponat);	
+
+	SwitchToInventorySlot(weaponat);	
 }
 
 void ABasePlayer::SwitchInventoryMouseWheelDown()
@@ -254,7 +344,6 @@ void ABasePlayer::SwitchInventoryMouseWheelDown()
 	}
 	SwitchToInventorySlot(weaponat);
 }
-#undef InventoryGetItem
 
 
 void ABasePlayer::Interact()
@@ -328,6 +417,11 @@ void ABasePlayer::Repair(AActor* repairObj)
 }
 
 
+UFTLPrototypeHealthComponent * ABasePlayer::GetHealthComponent()
+{
+	return nullptr;
+}
+
 void ABasePlayer::OnInteract()
 {
 
@@ -351,9 +445,6 @@ void ABasePlayer::MoveForward(float val)
 }
 
 
-//I am not sure how the inventory is going to work
-//Putting this here to quickly and easily change it all at once
-#define AddToInventory(item); pInventoryComponent->AddItemToInventory(item);
 
 void ABasePlayer::PopulateInventory()
 {
@@ -365,24 +456,21 @@ void ABasePlayer::PopulateInventory()
 		return; //We don't want to repopulate the inventory more than once do we?
 	}
 
-
 	UWorld* world = GetWorld();	//Get the world
 	FActorSpawnParameters spawnParams;	//Just basic spawnParams
-
 
 	if (classInformation.weaponInformation.gunItemTemplate != nullptr)
 	{
 		//Create the GunItem
 		AWeapon* gun = world->SpawnActor<AWeapon>(classInformation.weaponInformation.gunItemTemplate, spawnParams);
+		gun->SetOwner(this);
 
 		//Add it to inventory
 		pInventoryComponent->GunItem = gun;
-		//pInventoryComponent->AddItem(gun);
-		//pInventoryComponent->pGunItem = gun;
 	}
 	else
 	{
-		//print("No Gun Item");
+		print("No Gun Item");
 	}
 
 
@@ -390,15 +478,14 @@ void ABasePlayer::PopulateInventory()
 	{
 		//Create the Melee item
 		AWeapon* melee = world->SpawnActor<AWeapon>(classInformation.weaponInformation.meleeItemTemplate, spawnParams);
+		melee->SetOwner(this);
 
 		//Add it to inventory
 		pInventoryComponent->MeleeItem = melee;
-		//pInventoryComponent->AddItem(melee);
-		//pInventoryComponent->pMeleeItem = melee;
 	}
 	else
 	{
-		//print("No Melee Item");
+		print("No Melee Item");
 	}
 
 
@@ -406,15 +493,15 @@ void ABasePlayer::PopulateInventory()
 	{
 		//Create the Class item
 		AWeapon* classItem = world->SpawnActor<AWeapon>(classInformation.weaponInformation.classItemTemplate, spawnParams);
+		classItem->SetOwner(this);
+
 
 		//Add it to inventory
 		pInventoryComponent->ClassItem = classItem;
-		//pInventoryComponent->AddItem(classItem);
-		//pInventoryComponent->pClassItem = classItem;
 	}
 	else
 	{
-		//	print("No class Item");
+		print("No class Item");
 	}
 
 
@@ -422,22 +509,20 @@ void ABasePlayer::PopulateInventory()
 	{
 		//Create the Class item
 		AWeapon* grenade = world->SpawnActor<AWeapon>(classInformation.weaponInformation.grenadeItemTemplate, spawnParams);
+		grenade->SetOwner(this);
 
 		//Add it to inventory
 		pInventoryComponent->GrenadeItemClass = grenade;
-		//pInventoryComponent->AddItem(grenade);
-		//pInventoryComponent->pGrenadeItem = grenade;
 	}
 	else
 	{
-		//	print("No grenade Item");
+		print("No grenade Item");
 	}
 
 
 	//We have populated the inventory
 	bHasPopulatedInventory = true;
 }
-#undef AddToInventory
 
 
 void ABasePlayer::AddPlayerTags()
@@ -476,11 +561,7 @@ void ABasePlayer::AddPlayerTags()
 	}
 }
 
-
 void ABasePlayer::SetWeaponMesh()
 {
 	//pWeaponMesh = pActiveWeapon->GetMesh();
 }
-
-
-#undef print

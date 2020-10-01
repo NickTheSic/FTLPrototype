@@ -1,11 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
+#include "GunRifle.h"
 #include "SceneManagement.h"
 #include "DrawDebugHelpers.h"
 #include "EnemyBase.h"
-#include "GunRifle.h"
 #include "../FTLPrototypeCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "BasePlayer.h"
 
 AGunRifle::AGunRifle()
 {
@@ -62,7 +64,7 @@ void AGunRifle::Fire()
             FRotator(GetActorRotation().Pitch, GetActorRotation().Yaw + 90.0f, GetActorRotation().Roll), 
             3000.0f, 
             FCollisionObjectQueryParams::AllObjects);*/
-		AFTLPrototypeCharacter* character = Cast<AFTLPrototypeCharacter>(GetOwner());
+		ABasePlayer* character = Cast<ABasePlayer>(GetOwner());
 		if (character != nullptr)
 		{
 			character->GetRaycastComponent()->RaycastSingleFromPlayer(hit, 3000.0f, FCollisionObjectQueryParams::AllObjects);

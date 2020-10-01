@@ -26,25 +26,45 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		class UCameraComponent* pCameraComponent;
 
+	//The Meshes for the player
 	UPROPERTY(EditAnywhere, Category = "Mesh | Player")
 		class USkeletalMeshComponent* pMeshComponent = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Mesh | Weapon")
 		class USkeletalMeshComponent* pWeaponMesh = nullptr;
 
+	//This is how the AI sees the player
+	UPROPERTY(EditAnywhere, Category = "AI Sensing")
+		class UAIPerceptionStimuliSourceComponent* pAIPerception = nullptr;
 
-	UPROPERTY()
+
+	//Our custom components
+	UPROPERTY(EditDefaultsOnly)
 		class UUInventory* pInventoryComponent = nullptr; //A nullptr to the Inventory, created later
 
-	UPROPERTY()
-		class UHealthComponent* pHealthComponent = nullptr; //A ptr to the Health set to null for now
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		class UFTLPrototypeHealthComponent* pHealthComponent = nullptr; //A ptr to the Health set to null for now
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 		class URaycastComponent* pRaycastComponent = nullptr;
 
-	UPROPERTY()
+
+	//A Pointer to the weapon
+	UPROPERTY(EditDefaultsOnly)
 		class AWeapon* pActiveWeapon = nullptr; //A pointer to the active weapon
 
+
+	//Adirans' Inventory Index
 	int weaponat = 0;
+
+
+	//Code copied from the FTL Prototype
+		/** Sound to play each time we fire */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		class USoundBase* FireSound;
+
+	/** AnimMontage to play each time we fire */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		class UAnimMontage* FireAnimation;
 
 
 protected:
@@ -60,6 +80,24 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+
+	//Stolen form FTL Character
+	UFUNCTION(BlueprintCallable)
+		AWeapon* GetCurrentWeapon();
+
+	URaycastComponent* GetRaycastComponent();
+
+	UFUNCTION() //delegate
+		void OnHealthChanged(UFTLPrototypeHealthComponent* InHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+		bool bDied;
+
+	UFUNCTION(BlueprintCallable)
+		UFTLPrototypeHealthComponent* GetHealthComponent();
+
+
 
 	UFUNCTION()
 		void OnInteract();
@@ -83,7 +121,9 @@ public:
 		void StopUsingWeapon(); //StopFire()
 
 	UFUNCTION()
+		void Reload();
 
+	UFUNCTION()
 		void Interact();
 
 
