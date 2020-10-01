@@ -366,10 +366,6 @@ void ABasePlayer::Interact()
 
 	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 500.0f))
 	{
-		//Draw a Debug line while in the editor only
-		#if WITH_EDITOR
-		DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Cyan);
-		#endif
 
 		AActor* hitObj = ray.GetActor();
 		if (hitObj != nullptr)
@@ -381,6 +377,12 @@ void ABasePlayer::Interact()
 			}
 		}
 	}
+
+	//Draw a Debug line while in the editor only
+#if WITH_EDITOR
+	DrawDebugLine(GetWorld(), ray.TraceStart, ray.TraceEnd, FColor::Cyan, false, 4.0f);
+#endif
+
 }
 
 void ABasePlayer::Repair()
