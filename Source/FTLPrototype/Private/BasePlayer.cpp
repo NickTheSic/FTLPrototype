@@ -74,6 +74,10 @@ ABasePlayer::ABasePlayer()
 	//Setup the Raycast Component
 	pRaycastComponent = CreateDefaultSubobject<URaycastComponent>("Raycast Component");
 
+
+
+	bHasPopulatedInventory = false;
+
 }
 
 
@@ -90,7 +94,6 @@ void ABasePlayer::BeginPlay()
 
 
 	//Populate the inventory everytime BeginPlay gets called
-	bHasPopulatedInventory = false;
 	PopulateInventory();
 
 
@@ -114,6 +117,15 @@ void ABasePlayer::Tick(float DeltaTime)
 	//	print("Player is dead and I haven't gotten around to finishing this since the ")
 	//	UGameplayStatics::GetGameMode(this);
 	//}
+
+
+	//If we are out of Oxygen lets start dying
+	if (!pHealthComponent->GetOxygen())
+	{
+		//Set health to the current health minus a value
+		pHealthComponent->SetHealth(pHealthComponent->GetHealth() - 1 * DeltaTime);
+	}
+
 
 }
 
@@ -352,7 +364,7 @@ void ABasePlayer::Interact()
 
 	print("Interact function entered");
 
-	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 300.0f))
+	if (pRaycastComponent->RaycastSingleFromPlayer(ray, 500.0f))
 	{
 		//Draw a Debug line while in the editor only
 		#if WITH_EDITOR
@@ -419,7 +431,7 @@ void ABasePlayer::Repair(AActor* repairObj)
 
 UFTLPrototypeHealthComponent * ABasePlayer::GetHealthComponent()
 {
-	return nullptr;
+	return pHealthComponent;
 }
 
 void ABasePlayer::OnInteract()
@@ -453,6 +465,7 @@ void ABasePlayer::PopulateInventory()
 
 	if (bHasPopulatedInventory)
 	{
+		print("!!Inventory was already full!!");
 		return; //We don't want to repopulate the inventory more than once do we?
 	}
 
@@ -522,6 +535,7 @@ void ABasePlayer::PopulateInventory()
 
 	//We have populated the inventory
 	bHasPopulatedInventory = true;
+
 }
 
 

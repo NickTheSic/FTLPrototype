@@ -86,7 +86,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		AWeapon* GetCurrentWeapon();
 
-	URaycastComponent* GetRaycastComponent();
+	class URaycastComponent* GetRaycastComponent();
 
 	UFUNCTION() //delegate
 		void OnHealthChanged(UFTLPrototypeHealthComponent* InHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
@@ -95,7 +95,7 @@ public:
 		bool bDied;
 
 	UFUNCTION(BlueprintCallable)
-		UFTLPrototypeHealthComponent* GetHealthComponent();
+		class UFTLPrototypeHealthComponent* GetHealthComponent();
 
 
 
