@@ -43,10 +43,41 @@ public:
 	bool bisActive;
 	bool IsActive() { return bisActive; }
 
+	//Temporary Player pointer to target for health and oxygen manipulation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
+		class AFTLPrototypeCharacter* pPlayer;
+
+	//The lost stores the value that the player lost overtime of the event and the current is the present value
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
+		float fHealthLost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
+		float fHealthCurrent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
+		float fOxygenLost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
+		float fOxygenCurrent;
+
+	//Values that will hold the position in where the AI will spawn
+	UPROPERTY()
+		FVector SpawnPos1;
+	UPROPERTY()
+		FVector SpawnPos2;
+
+	//AI That will spawn
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
+		TSubclassOf<class AFTLPrototypeAI> AIClass;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//Set of bools to determine type of event, how fast they occur when active and by how much, which will be set in blueprints per event
 	//Values must be set in blueprints as code will set them to 0
+
+	//TEMP, when the event will occur
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)
+		float fEventTimer;
 
 	//Health Event
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EventType)

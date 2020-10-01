@@ -27,6 +27,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
 	float DefaultHealth;
+
+	UPROPERTY(BlueprintReadOnly, Category = "OxygenComponent")
+		float fOxygen;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OxygenComponent")
+		float fDefaultOxygen;
 	
 	UFUNCTION()
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
@@ -46,5 +52,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable)
+		void SetHealth(float val) { Health = val; }
 		
+	UFUNCTION(BlueprintCallable)
+		float GetOxygen() const { return fOxygen; }
+
+	UFUNCTION(BlueprintCallable)
+		void SetOxygen(float val) { fOxygen = val; }
 };

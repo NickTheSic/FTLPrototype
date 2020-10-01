@@ -13,6 +13,7 @@ UFTLPrototypeHealthComponent::UFTLPrototypeHealthComponent()
 	// TeamNum = 255;
 
 	DefaultHealth = 100;
+	fDefaultOxygen = 100;
 	bIsDead = false;
 }
 
@@ -27,7 +28,8 @@ void UFTLPrototypeHealthComponent::BeginPlay()
 	{
 		MyOwner->OnTakeAnyDamage.AddDynamic(this, &UFTLPrototypeHealthComponent::HandleTakeAnyDamage);
 	}
-
+	
+	fOxygen = fDefaultOxygen;
 	Health = DefaultHealth;
 }
 
