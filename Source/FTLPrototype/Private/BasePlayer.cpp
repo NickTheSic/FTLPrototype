@@ -19,6 +19,8 @@
 #include "UInventory.h"
 #include "Weapon.h"
 
+#include "ShipButtonBase.h"
+
 
 #undef print
 #define print(msg) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, msg);
@@ -374,6 +376,17 @@ void ABasePlayer::Interact()
 			{
 				//We hit a repairable object if Robert has named this the same
 				Repair(hitObj);
+			}
+
+			if (hitObj->Tags.Contains("Button"))
+			{
+				print("Activating a Button"); 
+				AShipButtonBase* button = Cast<AShipButtonBase>(hitObj);
+				if (button)
+				{
+					print("Activating a Button");
+					button->Activate();
+				}
 			}
 		}
 	}
